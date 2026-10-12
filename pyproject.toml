@@ -1,18 +1,37 @@
 [project]
 name = "pytest-triage"
 version = "0.1.0"
+description = "Shadow-mode triage agent for pytest-dev/pytest issues: labels, duplicates, missing info - measured against what maintainers actually did."
+readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "fastembed>=0.9.0",
     "httpx>=0.28.1",
     "numpy>=2.5.3",
+    "python-dotenv>=1.2.4",
     "rank-bm25>=0.2.2",
 ]
+
+[project.scripts]
+triage = "pytest_triage.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.9.28,<0.10.0"]
+build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
     "pytest>=9.1.1",
+    "ruff>=0.17.0",
 ]
 
 [tool.pytest.ini_options]
-pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+ignore = ["RUF001"]  # allow typographic characters in strings (em dashes in messages)
