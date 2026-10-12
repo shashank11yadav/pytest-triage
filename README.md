@@ -54,8 +54,13 @@ kNN vote ties it or wins: `topic: fixtures` 0.77 vs. 0.72 and
 | same, with Gemini 3.8 Flash | 5/15 correctly flagged; 4/30 false alarms | 15–58% |
 
 About 40% of duplicate flags are correct. That's **not good enough to tell a
-reporter "this is a duplicate"**, so duplicates appear only in the
-maintainer's view and never in the reply draft. In the September–October
+reporter "this is a duplicate"**.
+
+**Reply rule.** An output goes into the reply draft (text a maintainer could
+send to the reporter) only if its measured precision is at least **0.70**.
+Needs-info (0.48) and duplicates (about 0.40) are both below that bar, so
+today both appear only in a "for maintainer review" section, and no reply is
+drafted. The bar and the measured values are in `config.py`. In the September–October
 backtest, the pipeline had flagged 6 of the 7 issues maintainers later closed
 as duplicates. It also flagged 6 that were not closed as duplicates. (That
 check shows a flag was raised, not that the suggested target was right.)
@@ -89,8 +94,9 @@ new issue
   │     search  → BM25 + embeddings, fused with RRF, older issues only
   │     verify  → which of 8 candidates is the same problem? (enum of candidate numbers)
   │
-  └─ report: labels, missing info, possible duplicates (maintainer only),
-             injection signals, templated reply draft, trace (latency, cost)
+  └─ report: suggested labels; for maintainer review: possible missing info and
+             possible duplicates; injection signals; reply draft (only outputs
+             that clear the 0.70 precision bar); trace (latency, cost)
 ```
 
 ## Design decisions
@@ -154,6 +160,8 @@ uv run triage eval dupes [--llm]    # duplicate search / verifier
 uv run triage eval attacks          # prompt-injection suite
 uv run triage issue 14476           # triage one issue
 uv run triage shadow --since 2026-10-01 && uv run triage shadow-score
+uv run triage audit rate --rater YOU # blind human audit of "false positive" labels
+uv run triage audit score           # adjusted precision + agreement between raters
 uv run triage report                # docs/index.html + these tables
 uv run pytest && uv run ruff check .
 ```

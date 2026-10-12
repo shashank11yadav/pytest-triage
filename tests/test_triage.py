@@ -13,11 +13,17 @@ def test_reply_is_empty_when_nothing_to_ask():
     assert triage.draft_reply(report()) == ""
 
 
-def test_reply_asks_for_missing_items_but_never_asserts_duplicates():
+def test_low_precision_outputs_stay_out_of_the_reply():
+    # Measured precision (needs-info 0.48, duplicates ~0.40) is below the 0.70 bar.
+    full = report(duplicates=[4569], missing=["minimal reproducible example"])
+    assert triage.draft_reply(full) == ""
+
+
+def test_missing_items_enter_the_reply_once_precise_enough(monkeypatch):
+    monkeypatch.setitem(triage.config.MEASURED_PRECISION, "missing", 0.9)
     text = triage.draft_reply(report(duplicates=[4569], missing=["minimal reproducible example"]))
     assert "- minimal reproducible example" in text
-    assert "#4569" not in text  # ~40% precision: for maintainer review only
-    assert triage.draft_reply(report(duplicates=[4569])) == ""
+    assert "#4569" not in text  # duplicates are never asserted to a reporter
 
 
 def test_triage_issue_assembles_report(monkeypatch):
@@ -43,5 +49,6 @@ def test_triage_issue_assembles_report(monkeypatch):
     out = triage.triage_issue(issue, index, index)
     assert out["labels"] == ["type: bug"]
     assert out["injection_signals"]  # flagged for the human reviewer
-    assert "pytest and Python versions" in out["reply_draft"]
+    assert out["missing"] == ["pytest and Python versions"]
+    assert out["reply_draft"] == ""  # below the precision bar: maintainer view only
     assert out["trace"]["cost_usd"] == 0.0

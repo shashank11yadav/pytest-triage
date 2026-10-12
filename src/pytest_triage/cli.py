@@ -149,12 +149,13 @@ def cmd_issue(args: argparse.Namespace) -> None:
         print(json.dumps(report, indent=2))
         return
     print(f"#{report['number']} {report['title']}")
-    print(f"  labels:     {', '.join(report['labels']) or '-'}")
-    print(f"  missing:    {', '.join(report['missing']) or '-'}")
+    print(f"  suggested labels: {', '.join(report['labels']) or '-'}")
+    print("  for maintainer review (below the precision bar for a reply):")
+    print(f"    possibly missing:    {', '.join(report['missing']) or '-'}")
     dupes = ", ".join(f"#{n}" for n in report["duplicates"]) or "-"
-    print(f"  possible duplicates (maintainer review): {dupes}")
+    print(f"    possible duplicates: {dupes}")
     for v in report["duplicate_verdicts"]:
-        print(f"     #{v['number']} ({v['confidence']}): {v['reason']}")
+        print(f"      #{v['number']} ({v['confidence']}): {v['reason']}")
     if report["injection_signals"]:
         print(f"  !! injection signals: {report['injection_signals']}")
     print(f"  maintainers actually applied: {', '.join(issue['labels']) or '-'}")
@@ -180,6 +181,61 @@ def cmd_shadow_score(args: argparse.Namespace) -> None:
     save_result("shadow", "latest", result | {"at": _now()})
     print(json.dumps({k: v for k, v in result.items() if k != "labels"}, indent=2))
     print(f"label macro-F1 on maintainer-triaged: {result['labels']['macro_f1']:.2f}")
+
+
+def cmd_audit(args: argparse.Namespace) -> None:
+    from pytest_triage import audit
+    from pytest_triage.classify import DEFINITIONS, make_llm_classifier
+
+    _, test, memory_index = _label_setup("test")
+    if args.action == "sample":
+        name = f"llm:{config.LABEL_MODEL}:{config.LABEL_PROMPT}"
+        fps, tp = audit.false_positives(
+            test, make_llm_classifier(memory_index, prompt=config.LABEL_PROMPT)
+        )
+        sample = audit.draw_sample(fps, args.n)
+        audit.write_sample(
+            sample,
+            {
+                "predictor": name,
+                "seed": 11,
+                "tp": tp,
+                "fp": len(fps),
+                "n_issues": len(test),
+                "sample_size": len(sample),
+            },
+        )
+        print(
+            f"{len(fps)} false-positive labels (tp={tp}); sampled {len(sample)} -> {audit.SAMPLE}"
+        )
+    elif args.action == "rate":
+        sample, _ = audit.load_sample()
+        by_number = {i["number"]: i for i in test}
+        n = audit.rate_interactively(args.rater, sample, by_number, DEFINITIONS)
+        print(f"\nrated {n} this session -> {audit.ratings_path(args.rater)}")
+    else:
+        from pytest_triage.evaluate import _now, save_result
+
+        sample, meta = audit.load_sample()
+        raters = sorted(
+            p.stem.removeprefix("ratings_") for p in audit.AUDIT.glob("ratings_*.jsonl")
+        )
+        result = {"meta": meta, "raters": {}}
+        for rater in raters:
+            ratings = audit.load_ratings(rater)
+            verdicts = [
+                ratings[(s["number"], s["label"])]
+                for s in sample
+                if (s["number"], s["label"]) in ratings
+            ]
+            result["raters"][rater] = audit.adjusted_precision(meta["tp"], meta["fp"], verdicts)
+        if len(raters) >= 2:
+            a, b = (audit.load_ratings(r) for r in raters[:2])
+            both = [k for k in ((s["number"], s["label"]) for s in sample) if k in a and k in b]
+            result["kappa"] = audit.cohen_kappa([a[k] for k in both], [b[k] for k in both])
+            result["agreed_items"] = len(both)
+        save_result("audit", "labels", result | {"at": _now()})
+        print(json.dumps(result, indent=2))
 
 
 def cmd_report(args: argparse.Namespace) -> None:
@@ -231,6 +287,12 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("shadow-score", help="score predictions vs. maintainers").set_defaults(
         func=cmd_shadow_score
     )
+
+    p = sub.add_parser("audit", help="human audit of the model's 'false positive' labels")
+    p.add_argument("action", choices=["sample", "rate", "score"])
+    p.add_argument("--n", type=int, default=50, help="sample size (sample)")
+    p.add_argument("--rater", default="shashank", help="your name (rate)")
+    p.set_defaults(func=cmd_audit)
 
     sub.add_parser("report", help="write docs/index.html + print README tables").set_defaults(
         func=cmd_report

@@ -1,0 +1,8 @@
+{
+  "predictor": "llm:gemini-3.5-flash-lite:v2",
+  "seed": 11,
+  "tp": 168,
+  "fp": 225,
+  "n_issues": 237,
+  "sample_size": 50
+}

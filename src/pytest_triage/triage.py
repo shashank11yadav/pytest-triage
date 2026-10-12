@@ -8,21 +8,24 @@ outputs - the model never writes prose that reaches a maintainer.
 
 import time
 
-from pytest_triage import guard, llm
+from pytest_triage import config, guard, llm
 from pytest_triage.classify import assess
 from pytest_triage.config import DEDUPE_MODEL, LABEL_MODEL, LABEL_PROMPT
 from pytest_triage.dedupe import find_duplicates
 from pytest_triage.search import IssueIndex
 
 
-def draft_reply(report: dict) -> str:
-    """Suggested comment to the reporter, built only from enum values.
+def _reply_worthy(output: str) -> bool:
+    """Only outputs precise enough to say to a reporter go in the reply draft."""
+    return config.MEASURED_PRECISION[output] >= config.REPLY_MIN_PRECISION
 
-    Possible duplicates are deliberately NOT included: the verifier's precision is
-    ~40%, so they're shown to the maintainer for review, never asserted to the
-    reporter."""
+
+def draft_reply(report: dict) -> str:
+    """Suggested comment to the reporter, built only from enum values and gated
+    by measured precision (config.REPLY_MIN_PRECISION). Outputs below the bar -
+    today both missing-info and duplicates - appear only in the maintainer view."""
     lines = ["Thanks for the report!"]
-    if report["missing"]:
+    if report["missing"] and _reply_worthy("missing"):
         lines.append("\nTo help us investigate, could you add:")
         lines += [f"- {item}" for item in report["missing"]]
     if len(lines) == 1:
