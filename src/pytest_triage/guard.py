@@ -35,6 +35,13 @@ INJECTION_PATTERNS = [
     r"(label|mark|classify|close) (this|the issue) as\b",
     r"as an ai( language model)?\b",
     r"</?\s*issue\b",
+    # Added after the 19-attack suite (2026-10-12): authority claims and orders aimed at
+    # the bot landed 2 attacks. Each flags at most 2 of 6,416 real pytest issues.
+    r"\btriage (bot|tool|tools|assistant)\b",
+    r"\bmaintainer'?s? note\b",
+    r"\balready triaged\b",
+    r"\blabels?\s*:\s*`?(type|topic):",
+    r"\b(list|mark|report) .{0,40} as missing\b",
 ]
 INJECTION = re.compile("|".join(INJECTION_PATTERNS), re.IGNORECASE)
 

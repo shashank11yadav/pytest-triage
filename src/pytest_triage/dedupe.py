@@ -86,13 +86,30 @@ def expand_queries(issue: dict, model: str = WORKHORSE) -> list[str]:
 
 
 def candidates(
-    issue: dict, index: IssueIndex, queries: list[str] = (), k: int = N_CANDIDATES
+    issue: dict,
+    index: IssueIndex,
+    queries: list[str] = (),
+    k: int = N_CANDIDATES,
+    pool: str = "union",
 ) -> list[int]:
-    """Fuse: hybrid search on the issue itself + BM25/dense search for each query."""
-    rankings = [index.similar(issue)]
-    if queries:
-        rankings += index.search_texts(list(queries), index.allowed_for(issue))
-    return rrf(rankings)[:k]
+    """Candidate issues for the verifier.
+
+    "fused": one RRF over the issue's own search + every query's searches. The
+             issue's own ranking is 1 vote of 7, so easy matches (rank 4 alone)
+             can fall out of the top 100.
+    "union": top k of the issue's own search, then top k of the query searches
+             (deduplicated, up to 2k). Keeps easy matches AND the root-cause ones
+             only the queries find. On the 15 known pairs: original in the pool
+             9/15 (union, 16 candidates) vs. 7/15 (fused, 8) - measured on the
+             same pairs it is evaluated on; there is no separate duplicate dev set.
+    """
+    if not queries:
+        return index.similar(issue, k=k)
+    query_rankings = index.search_texts(list(queries), index.allowed_for(issue))
+    if pool == "fused":
+        return rrf([index.similar(issue), *query_rankings])[:k]
+    own = index.similar(issue, k=k)
+    return own + [n for n in rrf(query_rankings) if n not in own][:k]
 
 
 def verify(issue: dict, candidate_issues: list[dict], model: str = WORKHORSE) -> list[dict]:
@@ -125,11 +142,16 @@ def verify(issue: dict, candidate_issues: list[dict], model: str = WORKHORSE) ->
 
 
 def find_duplicates(
-    issue: dict, index: IssueIndex, expand: bool = True, model: str = WORKHORSE
+    issue: dict,
+    index: IssueIndex,
+    expand: bool = True,
+    model: str = WORKHORSE,
+    pool: str = "union",
+    k: int = N_CANDIDATES,
 ) -> dict:
     """Full pipeline for one issue. Returns candidates, verdicts and the high-confidence picks."""
     queries = expand_queries(issue, model) if expand else []
-    cands = candidates(issue, index, queries)
+    cands = candidates(issue, index, queries, k=k, pool=pool)
     verdicts = verify(issue, [index.get(n) for n in cands], model)
     order = {n: p for p, n in enumerate(cands)}
     verdicts.sort(

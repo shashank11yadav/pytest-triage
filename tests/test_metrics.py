@@ -70,3 +70,15 @@ def test_duplicate_clusters_join_transitive_pairs():
     clusters = duplicate_clusters({14997: [14635], 15071: [14635], 7: [8]})
     assert clusters[15071] == {14997, 15071, 14635}
     assert clusters[7] == {7, 8}
+
+
+def test_bootstrap_diff_detects_a_clear_gap_and_not_a_tie():
+    from pytest_triage.metrics import bootstrap_diff
+
+    truth = [{"type: bug"}] * 30 + [{"type: docs"}] * 30
+    perfect = list(truth)
+    wrong = [{"type: docs"}] * 30 + [{"type: bug"}] * 30
+    clear = bootstrap_diff(truth, perfect, wrong, rounds=200)
+    assert clear["diff"] > 0 and clear["ci95"][0] > 0 and clear["p_not_better"] == 0
+    tie = bootstrap_diff(truth, perfect, perfect, rounds=200)
+    assert tie["diff"] == 0 and tie["ci95"] == [0.0, 0.0]

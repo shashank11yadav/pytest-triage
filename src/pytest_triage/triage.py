@@ -64,6 +64,13 @@ def triage_issue(
         "duplicate_verdicts": dupes["verdicts"],
         "candidates": dupes["candidates"],
         "injection_signals": guard.injection_signals(f"{issue['title']}\n{issue['body'] or ''}"),
+        # Candidates are stranger-written text too, and they reach the verifier's prompt.
+        "candidate_injection_signals": {
+            n: signals
+            for n in dupes["candidates"]
+            if (c := index.get(n))
+            and (signals := guard.injection_signals(f"{c['title']}\n{c['body'] or ''}"))
+        },
         "models": {"labels": label_model, "duplicates": dedupe_model, "prompt": prompt},
     }
     report["reply_draft"] = draft_reply(report)

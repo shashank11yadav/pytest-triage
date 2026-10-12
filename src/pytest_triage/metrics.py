@@ -92,3 +92,33 @@ def duplicate_clusters(truth: dict[int, list[int]]) -> dict[int, set[int]]:
     for x in list(parent):
         clusters.setdefault(find(x), set()).add(x)
     return {x: clusters[find(x)] for x in parent}
+
+
+def bootstrap_diff(
+    truth: list[set[str]],
+    a: list[set[str]],
+    b: list[set[str]],
+    rounds: int = 2000,
+    seed: int = 0,
+) -> dict:
+    """Paired bootstrap of macro-F1(a) - macro-F1(b): resample issues with
+    replacement, rescore both predictors on the SAME resample each round.
+    Says whether a gap is bigger than what reshuffling the test set produces."""
+    import random
+
+    def macro(pred: list[set[str]], rows: list[int]) -> float:
+        return label_report(confusion((truth[r], pred[r]) for r in rows))["macro_f1"]
+
+    n = len(truth)
+    rng = random.Random(seed)
+    diffs = sorted(
+        macro(a, rows) - macro(b, rows)
+        for rows in ([rng.randrange(n) for _ in range(n)] for _ in range(rounds))
+    )
+    everything = list(range(n))
+    return {
+        "diff": macro(a, everything) - macro(b, everything),
+        "ci95": [diffs[int(0.025 * rounds)], diffs[int(0.975 * rounds) - 1]],
+        "p_not_better": sum(d <= 0 for d in diffs) / rounds,
+        "rounds": rounds,
+    }

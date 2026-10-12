@@ -99,6 +99,7 @@ def eval_dedupe(
     negatives: list[dict],
     expand: bool,
     model: str,
+    pool: str = "union",
 ) -> dict:
     """Candidate recall, then the verifier's high-confidence flags on
     duplicates AND non-duplicates (false alarms matter most)."""
@@ -116,7 +117,7 @@ def eval_dedupe(
     in_candidates = correct = wrong = missed = false_alarms = errors = 0
     for issue, wanted in rows:
         try:
-            result = find_duplicates(issue, index, expand=expand, model=model)
+            result = find_duplicates(issue, index, expand=expand, model=model, pool=pool)
         except BadOutput:
             errors += 1
             continue
@@ -143,6 +144,7 @@ def eval_dedupe(
     result = {
         "model": model,
         "expand": expand,
+        "pool": pool,
         "n_duplicates": n_pos,
         "n_non_duplicates": n_neg,
         "candidate_recall": in_candidates / n_pos,
@@ -159,7 +161,8 @@ def eval_dedupe(
         "at": _now(),
     }
     result["scoring"] = "cluster-aware: a flag is correct if it is in the issue's duplicate cluster"
-    save_result("dedupe", f"{model}{'+expand' if expand else ''}", result)
+    key = f"{model}{'+expand' if expand else ''}" + ("" if pool == "fused" else f"+{pool}")
+    save_result("dedupe", key, result)
     print(
         f"\ncandidates contain the original: {in_candidates}/{n_pos}\n"
         f"duplicates correctly flagged:    {correct}/{n_pos}"

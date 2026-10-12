@@ -96,6 +96,29 @@ def cmd_eval_labels(args: argparse.Namespace) -> None:
         eval_needs_info(name, predict, scored, NEEDS_INFO, file)
 
 
+def cmd_eval_significance(args: argparse.Namespace) -> None:
+    """Paired bootstrap on the test set, from cached predictions (free)."""
+    from pytest_triage import baselines
+    from pytest_triage.classify import make_llm_classifier
+    from pytest_triage.dataset import targets
+    from pytest_triage.evaluate import _now, save_result
+    from pytest_triage.metrics import bootstrap_diff
+
+    _, test, memory_index = _label_setup("test")
+    predictors = {
+        "llm v2": make_llm_classifier(memory_index, prompt="v2"),
+        "llm v1": make_llm_classifier(memory_index, prompt="v1"),
+        "knn": baselines.make_knn(memory_index),
+    }
+    preds = {k: [f(i) for i in test] for k, f in predictors.items()}
+    truth = [targets(i) for i in test]
+    for a, b in (("llm v2", "knn"), ("llm v1", "knn"), ("llm v2", "llm v1")):
+        result = bootstrap_diff(truth, preds[a], preds[b])
+        save_result("significance", f"{a} vs {b}", result | {"n": len(test), "at": _now()})
+        lo, hi = result["ci95"]
+        print(f"{a} - {b}: {result['diff']:+.3f}  95% CI [{lo:+.3f}, {hi:+.3f}]")
+
+
 def cmd_eval_dupes(args: argparse.Namespace) -> None:
     from pytest_triage.evaluate import eval_duplicates
     from pytest_triage.search import IssueIndex
@@ -109,7 +132,9 @@ def cmd_eval_dupes(args: argparse.Namespace) -> None:
     from pytest_triage.evaluate import eval_dedupe, sample_negatives
 
     negatives = sample_negatives(issues, truth, args.negatives)
-    eval_dedupe(index, truth, negatives, expand=not args.no_expand, model=args.model)
+    eval_dedupe(
+        index, truth, negatives, expand=not args.no_expand, model=args.model, pool=args.pool
+    )
 
 
 def _live_indexes():
@@ -130,10 +155,13 @@ def cmd_eval_attacks(args: argparse.Namespace) -> None:
     from pytest_triage.attacks import run_attacks
     from pytest_triage.evaluate import _now, save_result
 
-    _, index, labelled = _live_indexes()
-    result = run_attacks(index, labelled, args.model)
+    issues, index, labelled = _live_indexes()
+    result = run_attacks(issues, index, labelled, args.model)
     save_result("attacks", args.model or "pipeline", result | {"at": _now()})
-    print(f"\n{result['landed']}/{result['n']} attacks landed")
+    print(
+        f"\n{result['landed']}/{result['n']} attacks landed; "
+        f"{result['not_reached']} never reached the model (invalid test)"
+    )
 
 
 def cmd_issue(args: argparse.Namespace) -> None:
@@ -158,6 +186,8 @@ def cmd_issue(args: argparse.Namespace) -> None:
         print(f"      #{v['number']} ({v['confidence']}): {v['reason']}")
     if report["injection_signals"]:
         print(f"  !! injection signals: {report['injection_signals']}")
+    for n, signals in report["candidate_injection_signals"].items():
+        print(f"  !! injection signals in candidate #{n}: {signals}")
     print(f"  maintainers actually applied: {', '.join(issue['labels']) or '-'}")
     print(f"  trace: {report['trace']}")
     if report["reply_draft"]:
@@ -273,8 +303,17 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--llm", action="store_true", help="evaluate the LLM verifier (costs money)")
     p.add_argument("--no-expand", action="store_true", help="skip LLM query expansion")
     p.add_argument("--negatives", type=int, default=30, help="non-duplicates to test")
+    p.add_argument(
+        "--pool",
+        default="union",
+        choices=["union", "fused"],
+        help="how candidates are gathered (see dedupe.candidates)",
+    )
     p.add_argument("--model", default=config.WORKHORSE)
     p.set_defaults(func=cmd_eval_dupes)
+    ev.add_parser(
+        "significance", help="paired bootstrap of macro-F1 gaps (free, cached)"
+    ).set_defaults(func=cmd_eval_significance)
     p = ev.add_parser("attacks", help="prompt-injection suite against the real model")
     p.add_argument("--model", default=None, help="override config's chosen models")
     p.set_defaults(func=cmd_eval_attacks)

@@ -52,3 +52,4 @@ def test_triage_issue_assembles_report(monkeypatch):
     assert out["missing"] == ["pytest and Python versions"]
     assert out["reply_draft"] == ""  # below the precision bar: maintainer view only
     assert out["trace"]["cost_usd"] == 0.0
+    assert out["candidate_injection_signals"] == {}

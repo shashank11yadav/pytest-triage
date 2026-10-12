@@ -24,6 +24,32 @@
     "scoring": "cluster-aware: a flag is correct if it is in the issue's duplicate cluster",
     "wrong_target": 4
   },
+  "gemini-3.5-flash-lite+expand+union": {
+    "at": "2026-10-12T20:14:44+00:00",
+    "candidate_recall": 0.6666666666666666,
+    "correct": 7,
+    "errors": 0,
+    "expand": true,
+    "false_alarm_ci95": [
+      0.03459925995971615,
+      0.25621441315266624
+    ],
+    "false_alarm_rate": 0.1,
+    "false_alarms": 3,
+    "missed": 4,
+    "model": "gemini-3.5-flash-lite",
+    "n_duplicates": 15,
+    "n_non_duplicates": 30,
+    "pool": "union",
+    "precision": 0.5,
+    "recall": 0.4666666666666667,
+    "recall_ci95": [
+      0.24809225259746442,
+      0.6988336984894921
+    ],
+    "scoring": "cluster-aware: a flag is correct if it is in the issue's duplicate cluster",
+    "wrong_target": 4
+  },
   "gemini-3.8-flash+expand": {
     "at": "2026-10-12T18:23:29+00:00",
     "candidate_recall": 0.4666666666666667,

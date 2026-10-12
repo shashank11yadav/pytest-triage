@@ -81,9 +81,10 @@ THINKING_HEADROOM = {WORKHORSE: 0, STEP_UP: 1024}
 # The reply draft is text a maintainer could send to the REPORTER. An output goes in
 # only if its measured precision on the test set clears this bar; below it, the
 # output is shown to the maintainer for review instead. Measured 2026-10-12:
-# needs-info precision 0.48, duplicate flags ~0.40 - so today no reply is drafted.
+# needs-info precision 0.48; duplicate flags 0.50 with the union candidate pool
+# (0.36 before) - so today no reply is drafted.
 REPLY_MIN_PRECISION = 0.70
-MEASURED_PRECISION = {"missing": 0.48, "duplicates": 0.40}
+MEASURED_PRECISION = {"missing": 0.48, "duplicates": 0.50}
 
 SPEND_CAP_USD = 5.00  # whole project; calls past this are refused, not made
 
