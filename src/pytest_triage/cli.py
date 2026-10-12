@@ -243,6 +243,11 @@ def cmd_audit(args: argparse.Namespace) -> None:
         by_number = {i["number"]: i for i in test}
         n = audit.rate_interactively(args.rater, sample, by_number, DEFINITIONS)
         print(f"\nrated {n} this session -> {audit.ratings_path(args.rater)}")
+    elif args.action == "rate-ai":
+        sample, _ = audit.load_sample()
+        by_number = {i["number"]: i for i in test}
+        rater = audit.rate_with_model(sample, by_number, DEFINITIONS, args.model)
+        print(f"AI rater done -> {audit.ratings_path(rater)}")
     else:
         from pytest_triage.evaluate import _now, save_result
 
@@ -328,7 +333,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     p = sub.add_parser("audit", help="human audit of the model's 'false positive' labels")
-    p.add_argument("action", choices=["sample", "rate", "score"])
+    p.add_argument("action", choices=["sample", "rate", "rate-ai", "score"])
+    p.add_argument("--model", default=config.STEP_UP, help="AI rater model (rate-ai)")
     p.add_argument("--n", type=int, default=50, help="sample size (sample)")
     p.add_argument("--rater", default="shashank", help="your name (rate)")
     p.set_defaults(func=cmd_audit)

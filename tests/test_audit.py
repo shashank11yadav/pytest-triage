@@ -70,3 +70,22 @@ def test_cohen_kappa():
     a = ["correct"] * 5 + ["wrong"] * 5
     b = ["correct", "wrong"] * 5
     assert audit.cohen_kappa(a, b) == pytest.approx(0.2)
+
+
+def test_ai_rater_is_blind_and_falls_back_to_unsure(monkeypatch):
+    monkeypatch.setattr(audit, "load_ratings", lambda *a, **k: {})
+    seen = []
+
+    def fake_generate(body):
+        seen.append(body["input"])
+        return ({"verdict": "correct"} if len(seen) == 1 else {"verdict": "maybe"}), {}
+
+    monkeypatch.setattr("pytest_triage.llm.generate_json", fake_generate)
+    written = []
+    monkeypatch.setattr(audit, "add_rating", lambda rater, item, v, d=None: written.append(v))
+    sample = [{"number": 1, "label": "type: bug"}, {"number": 2, "label": "type: docs"}]
+    by_number = {1: issue(1, ["type: question"]), 2: issue(2)}
+    audit.rate_with_model(sample, by_number, {"type: bug": "d", "type: docs": "d"}, "m")
+    assert written == ["correct", "unsure"]  # invalid verdict -> unsure
+    assert "Maintainers applied: type: question" in seen[0]
+    assert all("llm-rater-a" not in s for s in seen)  # never shown other raters' verdicts

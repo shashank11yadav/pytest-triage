@@ -1,0 +1,47 @@
+{
+  "labels": {
+    "agreed_items": 50,
+    "at": "2026-10-12T20:59:02+00:00",
+    "kappa": 0.41391941391941395,
+    "meta": {
+      "fp": 225,
+      "n_issues": 237,
+      "predictor": "llm:gemini-3.5-flash-lite:v2",
+      "sample_size": 50,
+      "seed": 11,
+      "tp": 168
+    },
+    "raters": {
+      "ai-gemini-3.8-flash": {
+        "adjusted_ci95": [
+          0.6419885393134115,
+          0.7963270048125904
+        ],
+        "adjusted_precision": 0.7195824894843433,
+        "measured_precision": 0.42748091603053434,
+        "rated": 50,
+        "share_ci95": [
+          0.37467331533409215,
+          0.6442511684059913
+        ],
+        "share_of_fps_correct": 0.5102040816326531,
+        "unsure": 1
+      },
+      "llm-rater-a": {
+        "adjusted_ci95": [
+          0.6813315403836903,
+          0.8380435498257576
+        ],
+        "adjusted_precision": 0.7635247261865251,
+        "measured_precision": 0.42748091603053434,
+        "rated": 50,
+        "share_ci95": [
+          0.4433924238701789,
+          0.7171160670289898
+        ],
+        "share_of_fps_correct": 0.5869565217391305,
+        "unsure": 4
+      }
+    }
+  }
+}

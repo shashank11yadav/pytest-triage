@@ -52,12 +52,30 @@ The LLM's biggest gains are on labels that depend on **intent**:
 kNN vote ties it or wins: `topic: fixtures` 0.77 vs. 0.72 and
 `topic: parametrize` 0.54 vs. 0.48.
 
-**Precision is the weak spot, and it is probably understated.** The model
-suggests 1.66 labels per issue, while maintainers apply 1.01 of these 10.
-Measured precision is 0.43. A blind two-rater audit of 50 random "false
-positive" labels (`triage audit`) measures how many were labels maintainers
-simply didn't apply; the result is pending. Until it is in, treat 0.43 as a
-lower bound.
+**Precision is understated by incomplete maintainer labels.** The model
+suggests 1.66 labels per issue, while maintainers apply 1.01 of these 10, so
+measured precision is only 0.43. An audit (`triage audit`) took 50 random
+"false positive" labels (seed 11, out of 225) and had two raters judge, blind
+to each other, whether each label actually fits the issue:
+
+| Rater | "False positives" judged correct | Adjusted precision (95% CI) |
+|---|---|---|
+| LLM rater A | 59% | 0.76 (0.68–0.84) |
+| Gemini 3.8 Flash (AI) | 51% | 0.72 (0.64–0.80) |
+| Strictest: correct only if both agree | 38% | 0.65 |
+
+The raters agreed on 34 of 50 items (Cohen's kappa 0.41, moderate).
+**Both raters are AI, and no human rated these.** Gemini is judging labels
+from its own model family. Read **about 0.65–0.75** as an indication of real
+precision, not a measurement.
+
+The labels both raters called wrong fall into three patterns:
+- **Type-family conflicts.** Maintainers chose `proposal` and the model said
+  `enhancement`, or maintainers chose `enhancement`/`docs` and the model said
+  `bug`.
+- **`topic: fixtures` on built-in plugin fixtures** (`monkeypatch`, `tmp_path`,
+  `capfd`), which maintainers label with `plugin:` labels instead.
+- **`topic: reporting` applied to output-adjacent but non-terminal issues.**
 
 ### Missing information: does the issue need `status: needs information`?
 
@@ -135,7 +153,7 @@ templated and precision-gated reply, and no write access.
 ### Cost and latency
 
 - **About $0.0015 per issue** (3 Gemini calls), with a p50 latency of 3.3 s.
-- The entire development spend, including every evaluation above, was **$1.32**.
+- The entire development spend, including every evaluation above, was **$1.37**.
 
 ## How it works
 
@@ -212,7 +230,8 @@ new issue
   the bootstrap table). Duplicate results have intervals 30–45 points wide.
 - **Maintainer labels are incomplete ground truth.** Maintainers apply about 1
   label per issue, so measured precision understates real precision. The
-  audit quantifies by how much.
+  audit's correction rests on two AI raters with moderate agreement
+  (kappa 0.41) and **no human rater**.
 - **The duplicate improvements were measured on the data used to design them.**
   There's no separate duplicate dev set.
 - **The attack suite was written by the defender.** It also found 2 real
@@ -238,6 +257,7 @@ uv run triage eval significance     # paired bootstrap of label gaps (free)
 uv run triage issue 14476           # triage one issue
 uv run triage shadow --since 2026-10-01 && uv run triage shadow-score
 uv run triage audit rate --rater YOU # blind human audit of "false positive" labels
+uv run triage audit rate-ai         # blind AI second rater (gemini-3.8-flash)
 uv run triage audit score           # adjusted precision + agreement between raters
 uv run triage report                # docs/index.html + these tables
 uv run pytest && uv run ruff check .
