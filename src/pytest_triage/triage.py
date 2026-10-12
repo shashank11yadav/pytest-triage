@@ -16,12 +16,12 @@ from pytest_triage.search import IssueIndex
 
 
 def draft_reply(report: dict) -> str:
-    """Suggested maintainer comment. Built only from enums and issue numbers."""
+    """Suggested comment to the reporter, built only from enum values.
+
+    Possible duplicates are deliberately NOT included: the verifier's precision is
+    ~40%, so they're shown to the maintainer for review, never asserted to the
+    reporter."""
     lines = ["Thanks for the report!"]
-    dupes = report["duplicates"]
-    if dupes:
-        refs = ", ".join(f"#{n}" for n in dupes)
-        lines.append(f"\nThis looks like it may be the same problem as {refs}. Could you check?")
     if report["missing"]:
         lines.append("\nTo help us investigate, could you add:")
         lines += [f"- {item}" for item in report["missing"]]

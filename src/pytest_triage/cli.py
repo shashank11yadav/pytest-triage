@@ -151,7 +151,8 @@ def cmd_issue(args: argparse.Namespace) -> None:
     print(f"#{report['number']} {report['title']}")
     print(f"  labels:     {', '.join(report['labels']) or '-'}")
     print(f"  missing:    {', '.join(report['missing']) or '-'}")
-    print(f"  duplicates: {', '.join(f'#{n}' for n in report['duplicates']) or '-'}")
+    dupes = ", ".join(f"#{n}" for n in report["duplicates"]) or "-"
+    print(f"  possible duplicates (maintainer review): {dupes}")
     for v in report["duplicate_verdicts"]:
         print(f"     #{v['number']} ({v['confidence']}): {v['reason']}")
     if report["injection_signals"]:
@@ -203,7 +204,7 @@ def build_parser() -> argparse.ArgumentParser:
     p = ev.add_parser("labels", help="label predictors vs. maintainer labels")
     p.add_argument("--llm", action="store_true", help="include the Gemini classifier (costs money)")
     p.add_argument("--model", default=config.WORKHORSE)
-    p.add_argument("--prompt", default="v1", choices=["v1", "v2"])
+    p.add_argument("--prompt", default=config.LABEL_PROMPT, choices=["v1", "v2"])
     p.add_argument(
         "--split",
         default="test",

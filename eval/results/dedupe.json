@@ -1,8 +1,8 @@
 {
   "gemini-3.5-flash-lite+expand": {
-    "at": "2026-10-12T17:53:44+00:00",
-    "candidate_recall": 0.3333333333333333,
-    "correct": 4,
+    "at": "2026-10-12T18:20:14+00:00",
+    "candidate_recall": 0.4,
+    "correct": 5,
     "errors": 0,
     "expand": true,
     "false_alarm_ci95": [
@@ -15,12 +15,38 @@
     "model": "gemini-3.5-flash-lite",
     "n_duplicates": 15,
     "n_non_duplicates": 30,
-    "precision": 0.2857142857142857,
-    "recall": 0.26666666666666666,
+    "precision": 0.35714285714285715,
+    "recall": 0.3333333333333333,
     "recall_ci95": [
-      0.1089727610318281,
-      0.5195088965768675
+      0.15176100694691236,
+      0.5828687484878701
     ],
-    "wrong_target": 5
+    "scoring": "cluster-aware: a flag is correct if it is in the issue's duplicate cluster",
+    "wrong_target": 4
+  },
+  "gemini-3.8-flash+expand": {
+    "at": "2026-10-12T18:23:29+00:00",
+    "candidate_recall": 0.4666666666666667,
+    "correct": 5,
+    "errors": 0,
+    "expand": true,
+    "false_alarm_ci95": [
+      0.05309569424218104,
+      0.2968168394441695
+    ],
+    "false_alarm_rate": 0.13333333333333333,
+    "false_alarms": 4,
+    "missed": 7,
+    "model": "gemini-3.8-flash",
+    "n_duplicates": 15,
+    "n_non_duplicates": 30,
+    "precision": 0.4166666666666667,
+    "recall": 0.3333333333333333,
+    "recall_ci95": [
+      0.15176100694691236,
+      0.5828687484878701
+    ],
+    "scoring": "cluster-aware: a flag is correct if it is in the issue's duplicate cluster",
+    "wrong_target": 3
   }
 }

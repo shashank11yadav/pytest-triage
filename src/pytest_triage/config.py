@@ -65,8 +65,11 @@ PRICES = {
 }
 # What the live pipeline (`triage issue`, `triage shadow`) uses. Chosen on the
 # 2024 dev split, never on test - see eval/results/labels_dev.json.
+# Dev results (2026-10-12): flash-lite v2 0.535 macro-F1 vs. 3.8-flash v2 0.56 at 2.7x
+# the cost and worse needs-info; duplicate verifier precision 36% (lite) vs. 42%
+# (3.8-flash), a one-false-alarm difference on 45 issues. Cheap model wins both.
 LABEL_MODEL = WORKHORSE
-LABEL_PROMPT = "v1"
+LABEL_PROMPT = "v2"
 DEDUPE_MODEL = WORKHORSE
 
 # Lowest thinking level each model accepts (3.8-flash rejects "minimal" with a 400,

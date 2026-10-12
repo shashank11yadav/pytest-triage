@@ -1,0 +1,113 @@
+{
+  "latest": {
+    "at": "2026-10-12T19:08:32+00:00",
+    "closed_as_duplicate": [
+      14995,
+      14997,
+      15071,
+      15080,
+      15081,
+      15141,
+      15146
+    ],
+    "cost_usd_total": 0.0531,
+    "flagged_and_closed_duplicate": [
+      14995,
+      14997,
+      15071,
+      15080,
+      15081,
+      15146
+    ],
+    "flagged_duplicate": [
+      14992,
+      14994,
+      14995,
+      14997,
+      15036,
+      15067,
+      15071,
+      15080,
+      15081,
+      15097,
+      15124,
+      15146
+    ],
+    "labels": {
+      "labels": {
+        "topic: collection": {
+          "f1": 0.6666666666666666,
+          "precision": 1.0,
+          "recall": 0.5,
+          "support": 2
+        },
+        "topic: config": {
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 0
+        },
+        "topic: fixtures": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 3
+        },
+        "topic: parametrize": {
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 0
+        },
+        "topic: reporting": {
+          "f1": 0.8,
+          "precision": 0.6666666666666666,
+          "recall": 1.0,
+          "support": 2
+        },
+        "type: bug": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 4
+        },
+        "type: docs": {
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 0
+        },
+        "type: enhancement": {
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 0
+        },
+        "type: proposal": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 1
+        },
+        "type: question": {
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 0
+        }
+      },
+      "macro_f1": 0.44666666666666666,
+      "micro_f1": 0.8461538461538461
+    },
+    "latency_p50_s": 3.34,
+    "latency_p95_s": 13.08,
+    "maintainer_triaged": 7,
+    "needs_info": {
+      "f1": 0.0,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "predicted": 37,
+    "still_untriaged": 30
+  }
+}

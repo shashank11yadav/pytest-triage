@@ -13,10 +13,11 @@ def test_reply_is_empty_when_nothing_to_ask():
     assert triage.draft_reply(report()) == ""
 
 
-def test_reply_mentions_duplicates_and_missing_items():
+def test_reply_asks_for_missing_items_but_never_asserts_duplicates():
     text = triage.draft_reply(report(duplicates=[4569], missing=["minimal reproducible example"]))
-    assert "#4569" in text
     assert "- minimal reproducible example" in text
+    assert "#4569" not in text  # ~40% precision: for maintainer review only
+    assert triage.draft_reply(report(duplicates=[4569])) == ""
 
 
 def test_triage_issue_assembles_report(monkeypatch):
