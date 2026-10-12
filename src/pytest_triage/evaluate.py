@@ -35,11 +35,13 @@ def print_label_table(name: str, result: dict) -> None:
     print(f"{'micro-F1':<22}{'':>12}{result['micro_f1']:>6.2f}")
 
 
-def eval_labels(predictors: dict[str, Predictor], test: list[dict]) -> dict[str, dict]:
+def eval_labels(
+    predictors: dict[str, Predictor], test: list[dict], file: str = "labels"
+) -> dict[str, dict]:
     results = {}
     for name, predict in predictors.items():
         result = score_predictor(predict, test) | {"n": len(test), "at": _now()}
-        save_result("labels", name, result)
+        save_result(file, name, result)
         print_label_table(name, result)
         results[name] = result
     return results
@@ -102,10 +104,13 @@ def eval_dedupe(
     duplicates AND non-duplicates (false alarms matter most)."""
     from pytest_triage.dedupe import find_duplicates
     from pytest_triage.llm import BadOutput
+    from pytest_triage.metrics import duplicate_clusters
 
+    clusters = duplicate_clusters(truth)
     rows = []
-    for number, wanted in truth.items():
-        rows.append((index.get(number), wanted))
+    for number in truth:
+        # Correct = anything in the same duplicate cluster, other than the issue itself.
+        rows.append((index.get(number), sorted(clusters[number] - {number})))
     rows += [(neg, []) for neg in negatives]
 
     in_candidates = correct = wrong = missed = false_alarms = errors = 0
@@ -153,6 +158,7 @@ def eval_dedupe(
         "errors": errors,
         "at": _now(),
     }
+    result["scoring"] = "cluster-aware: a flag is correct if it is in the issue's duplicate cluster"
     save_result("dedupe", f"{model}{'+expand' if expand else ''}", result)
     print(
         f"\ncandidates contain the original: {in_candidates}/{n_pos}\n"
@@ -164,7 +170,9 @@ def eval_dedupe(
     return result
 
 
-def eval_needs_info(name: str, predict, test: list[dict], label: str) -> dict:
+def eval_needs_info(
+    name: str, predict, test: list[dict], label: str, file: str = "needs_info"
+) -> dict:
     """Binary P/R/F1: does the predictor flag the issues maintainers asked for more info on?"""
     from pytest_triage.metrics import prf
 
@@ -177,7 +185,7 @@ def eval_needs_info(name: str, predict, test: list[dict], label: str) -> dict:
     p, r, f1 = prf(tp, fp, fn)
     result = {"precision": p, "recall": r, "f1": f1, "support": tp + fn, "flagged": tp + fp}
     result |= {"n": len(test), "at": _now()}
-    save_result("needs_info", name, result)
+    save_result(file, name, result)
     print(
         f"\n== needs-info: {name}  P {p:.2f}  R {r:.2f}  F1 {f1:.2f}  "
         f"(support {tp + fn}, flagged {tp + fp}, n={len(test)})"

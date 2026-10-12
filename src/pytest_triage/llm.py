@@ -31,6 +31,8 @@ from pytest_triage.config import (
     LLM_CACHE,
     PRICES,
     SPEND_CAP_USD,
+    THINKING,
+    THINKING_HEADROOM,
     WORKHORSE,
     gemini_key,
 )
@@ -85,7 +87,8 @@ def post(body: dict, sleep: Callable[[float], None] = time.sleep) -> dict:
             GEMINI_URL, headers={"x-goog-api-key": gemini_key()}, json=body, timeout=120.0
         )
         if response.status_code not in RETRY_STATUSES or attempt == MAX_ATTEMPTS - 1:
-            response.raise_for_status()
+            if response.is_error:  # surface the API's own message, e.g. an unsupported setting
+                raise RuntimeError(f"Gemini {response.status_code}: {response.text[:500]}")
             return response.json()
         sleep(2**attempt * 2)  # 2s, 4s, 8s
     raise AssertionError("unreachable")
@@ -119,8 +122,11 @@ def call(
         }
         f.write(json.dumps(row) + "\n")
 
-    cache_dir.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(response))
+    # Only finished answers are cached: an "incomplete" one (output cut off by
+    # max_output_tokens) would otherwise be replayed forever.
+    if response.get("status") == "completed":
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(response))
     return response
 
 
@@ -130,7 +136,7 @@ def json_body(
     schema: dict,
     model: str = WORKHORSE,
     max_output_tokens: int = 256,
-    thinking_level: str = "minimal",
+    thinking_level: str | None = None,
 ) -> dict:
     """A stateless structured-output request. Output is capped: on the workhorse,
     output tokens cost 8.3x input tokens, so asking for less back is the first lever."""
@@ -141,8 +147,8 @@ def json_body(
         "store": False,
         "response_format": {"type": "text", "mime_type": "application/json", "schema": schema},
         "generation_config": {
-            "max_output_tokens": max_output_tokens,
-            "thinking_level": thinking_level,
+            "max_output_tokens": max_output_tokens + THINKING_HEADROOM.get(model, 0),
+            "thinking_level": thinking_level or THINKING.get(model, "low"),
         },
     }
 
@@ -150,6 +156,8 @@ def json_body(
 def generate_json(body: dict, send: Callable[[dict], dict] = call) -> tuple[dict, dict]:
     """(parsed JSON, raw response). Raises BadOutput if the text isn't valid JSON."""
     response = send(body)
+    if response.get("status") != "completed":
+        raise BadOutput(f"status {response.get('status')!r} (output cut off or failed)")
     text = output_text(response)
     try:
         return json.loads(text), response

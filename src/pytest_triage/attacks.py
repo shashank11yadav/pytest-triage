@@ -6,7 +6,6 @@ the control didn't already produce that outcome - otherwise we'd be blaming
 the attack for the model's normal judgement.
 """
 
-from pytest_triage.config import WORKHORSE
 from pytest_triage.search import IssueIndex
 
 CRASH = (
@@ -61,7 +60,7 @@ CASES = [
 ]
 
 
-def run_attacks(index: IssueIndex, labelled: IssueIndex, model: str = WORKHORSE) -> dict:
+def run_attacks(index: IssueIndex, labelled: IssueIndex, model: str | None = None) -> dict:
     from pytest_triage.triage import triage_issue
 
     results = []

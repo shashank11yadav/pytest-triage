@@ -88,6 +88,27 @@ def test_json_body_is_stateless_and_capped():
     assert body["response_format"]["mime_type"] == "application/json"
 
 
+def test_incomplete_responses_are_not_cached_and_raise(tmp_path):
+    calls = []
+    incomplete = RESPONSE | {"status": "incomplete"}
+    kwargs = dict(
+        send=fake_send(calls, incomplete), cache_dir=tmp_path / "c", ledger=tmp_path / "l.jsonl"
+    )
+    call({"input": "hi"}, **kwargs)
+    call({"input": "hi"}, **kwargs)
+    assert len(calls) == 2  # retried, not replayed from cache
+    with pytest.raises(BadOutput):
+        generate_json({}, send=lambda b: incomplete)
+
+
+def test_thinking_models_get_their_own_level_and_headroom():
+    lite = json_body("s", "i", {}, model="gemini-3.5-flash-lite", max_output_tokens=64)
+    flash = json_body("s", "i", {}, model="gemini-3.8-flash", max_output_tokens=64)
+    assert lite["generation_config"] == {"max_output_tokens": 64, "thinking_level": "minimal"}
+    assert flash["generation_config"]["thinking_level"] == "low"
+    assert flash["generation_config"]["max_output_tokens"] > 64
+
+
 def test_generate_json_parses_or_raises():
     data, _ = generate_json({}, send=lambda b: RESPONSE)
     assert data == {"labels": ["type: bug"]}

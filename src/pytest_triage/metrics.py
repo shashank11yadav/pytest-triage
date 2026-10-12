@@ -68,3 +68,27 @@ def wilson(successes: int, n: int, z: float = 1.96) -> tuple[float, float]:
     centre = (p + z * z / (2 * n)) / (1 + z * z / n)
     half = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / (1 + z * z / n)
     return max(0.0, centre - half), min(1.0, centre + half)
+
+
+def duplicate_clusters(truth: dict[int, list[int]]) -> dict[int, set[int]]:
+    """Group known duplicate pairs into clusters (union-find).
+
+    If A duplicates C and B duplicates C, then flagging A as a duplicate of B is
+    correct too - but a per-pair check would call it wrong.
+    """
+    parent: dict[int, int] = {}
+
+    def find(x: int) -> int:
+        parent.setdefault(x, x)
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    for dup, targets_ in truth.items():
+        for t in targets_:
+            parent[find(dup)] = find(t)
+    clusters: dict[int, set[int]] = {}
+    for x in list(parent):
+        clusters.setdefault(find(x), set()).add(x)
+    return {x: clusters[find(x)] for x in parent}

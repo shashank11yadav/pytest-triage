@@ -28,6 +28,7 @@ SHADOW = EVAL / "shadow"
 
 # --- dataset ----------------------------------------------------------------
 SPLIT_DATE = "2025-01-01"  # created before -> memory, on/after -> test
+DEV_DATE = "2024-01-01"  # memory issues from here to SPLIT_DATE = dev set for choosing variants
 
 # Top 5 `type:` + top 5 `topic:` labels by count (snapshot of 2026-10-08).
 # Each has 173+ memory examples; rarer labels are too thin to learn or score.
@@ -62,6 +63,18 @@ PRICES = {
     # Promo through 2026-12-31; doubles to 1.50 / 0.15 / 7.50 on 2027-01-01.
     STEP_UP: {"input": 0.75, "cached": 0.075, "output": 3.75},
 }
+# What the live pipeline (`triage issue`, `triage shadow`) uses. Chosen on the
+# 2024 dev split, never on test - see eval/results/labels_dev.json.
+LABEL_MODEL = WORKHORSE
+LABEL_PROMPT = "v1"
+DEDUPE_MODEL = WORKHORSE
+
+# Lowest thinking level each model accepts (3.8-flash rejects "minimal" with a 400,
+# verified 2026-10-12). Thinking tokens count against max_output_tokens, so thinking
+# models get extra output headroom or the answer is cut off (status "incomplete").
+THINKING = {WORKHORSE: "minimal", STEP_UP: "low"}
+THINKING_HEADROOM = {WORKHORSE: 0, STEP_UP: 1024}
+
 SPEND_CAP_USD = 5.00  # whole project; calls past this are refused, not made
 
 

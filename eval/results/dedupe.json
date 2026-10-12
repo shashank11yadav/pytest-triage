@@ -1,0 +1,26 @@
+{
+  "gemini-3.5-flash-lite+expand": {
+    "at": "2026-10-12T17:53:44+00:00",
+    "candidate_recall": 0.3333333333333333,
+    "correct": 4,
+    "errors": 0,
+    "expand": true,
+    "false_alarm_ci95": [
+      0.07336434240351683,
+      0.33564705185680177
+    ],
+    "false_alarm_rate": 0.16666666666666666,
+    "false_alarms": 5,
+    "missed": 6,
+    "model": "gemini-3.5-flash-lite",
+    "n_duplicates": 15,
+    "n_non_duplicates": 30,
+    "precision": 0.2857142857142857,
+    "recall": 0.26666666666666666,
+    "recall_ci95": [
+      0.1089727610318281,
+      0.5195088965768675
+    ],
+    "wrong_target": 5
+  }
+}

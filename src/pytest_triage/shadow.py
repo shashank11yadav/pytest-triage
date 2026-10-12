@@ -11,7 +11,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from pytest_triage.classify import NEEDS_INFO
-from pytest_triage.config import LABELS, SHADOW, TRACES, WORKHORSE
+from pytest_triage.config import LABELS, SHADOW, TRACES
 from pytest_triage.dataset import is_evaluable, targets
 from pytest_triage.metrics import confusion, label_report, prf
 from pytest_triage.search import IssueIndex
@@ -38,7 +38,7 @@ def run_shadow(
     labelled: IssueIndex,
     since: str,
     limit: int,
-    model: str = WORKHORSE,
+    model: str | None = None,
 ) -> int:
     """Triage issues created on/after `since` that haven't been predicted yet."""
     from pytest_triage.triage import triage_issue
@@ -54,7 +54,7 @@ def run_shadow(
                 "number": issue["number"],
                 "created_at": issue["created_at"],
                 "predicted_at": datetime.now(UTC).isoformat(timespec="seconds"),
-                "model": model,
+                "models": report["models"],
                 "labels": report["labels"],
                 "needs_info": bool(report["missing"]),
                 "duplicates": report["duplicates"],

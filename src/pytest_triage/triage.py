@@ -10,7 +10,7 @@ import time
 
 from pytest_triage import guard, llm
 from pytest_triage.classify import assess
-from pytest_triage.config import WORKHORSE
+from pytest_triage.config import DEDUPE_MODEL, LABEL_MODEL, LABEL_PROMPT
 from pytest_triage.dedupe import find_duplicates
 from pytest_triage.search import IssueIndex
 
@@ -31,7 +31,11 @@ def draft_reply(report: dict) -> str:
 
 
 def triage_issue(
-    issue: dict, index: IssueIndex, labelled: IssueIndex, model: str = WORKHORSE
+    issue: dict,
+    index: IssueIndex,
+    labelled: IssueIndex,
+    model: str | None = None,
+    prompt: str = LABEL_PROMPT,
 ) -> dict:
     """`index`: all issues (duplicate search). `labelled`: triaged issues (few-shot examples).
     Both are searched only for issues created before this one."""
@@ -40,11 +44,12 @@ def triage_issue(
     timings = {}
 
     t = time.perf_counter()
-    assessment = assess(issue, labelled, model, before=issue["created_at"])
+    label_model, dedupe_model = model or LABEL_MODEL, model or DEDUPE_MODEL
+    assessment = assess(issue, labelled, label_model, before=issue["created_at"], prompt=prompt)
     timings["assess_s"] = time.perf_counter() - t
 
     t = time.perf_counter()
-    dupes = find_duplicates(issue, index, expand=True, model=model)
+    dupes = find_duplicates(issue, index, expand=True, model=dedupe_model)
     timings["duplicates_s"] = time.perf_counter() - t
 
     report = {
@@ -56,7 +61,7 @@ def triage_issue(
         "duplicate_verdicts": dupes["verdicts"],
         "candidates": dupes["candidates"],
         "injection_signals": guard.injection_signals(f"{issue['title']}\n{issue['body'] or ''}"),
-        "model": model,
+        "models": {"labels": label_model, "duplicates": dedupe_model, "prompt": prompt},
     }
     report["reply_draft"] = draft_reply(report)
     report["trace"] = {

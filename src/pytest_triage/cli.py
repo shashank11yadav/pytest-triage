@@ -54,11 +54,15 @@ def cmd_stats(args: argparse.Namespace) -> None:
         print(f"{label:<22}{m[label]:>8}{t[label]:>8}")
 
 
-def _label_setup():
+def _label_setup(which: str):
+    """(memory, scored issues, index of memory) for the test split, or for the dev
+    split (2024 issues scored, few-shot memory = issues before 2024)."""
     from pytest_triage.dataset import is_evaluable, split
     from pytest_triage.search import IssueIndex
 
     memory, test = split([i for i in store.load_issues() if is_evaluable(i)])
+    if which == "dev":
+        memory, test = split(memory, date=config.DEV_DATE)
     return memory, test, IssueIndex.build(memory)
 
 
@@ -66,29 +70,30 @@ def cmd_eval_labels(args: argparse.Namespace) -> None:
     from pytest_triage import baselines
     from pytest_triage.evaluate import eval_labels
 
-    memory, test, memory_index = _label_setup()
-    keywords = baselines.mine_keywords(memory)
+    memory, scored, memory_index = _label_setup(args.split)
+    suffix = "" if args.split == "test" else "_dev"
     predictors = {
         "everything": baselines.predict_everything,
         "majority": baselines.make_majority(memory),
-        "keywords": baselines.make_keyword_predictor(keywords),
+        "keywords": baselines.make_keyword_predictor(baselines.mine_keywords(memory)),
         "knn": baselines.make_knn(memory_index),
     }
+    name = f"llm:{args.model}:{args.prompt}"
     if args.llm:
         from pytest_triage.classify import make_llm_classifier
 
-        predictors[f"llm:{args.model}"] = make_llm_classifier(memory_index, model=args.model)
-    eval_labels({k: v for k, v in predictors.items() if not args.only or k in args.only}, test)
+        predictors[name] = make_llm_classifier(memory_index, args.model, args.prompt)
+    chosen = {k: v for k, v in predictors.items() if not args.only or k in args.only}
+    eval_labels(chosen, scored, file=f"labels{suffix}")
 
     if args.llm:
         from pytest_triage.classify import NEEDS_INFO, make_needs_info
         from pytest_triage.evaluate import eval_needs_info
 
-        always = lambda issue: True  # noqa: E731 - baseline: flag everything
-        eval_needs_info("always", always, test, NEEDS_INFO)
-        eval_needs_info(
-            f"llm:{args.model}", make_needs_info(memory_index, args.model), test, NEEDS_INFO
-        )
+        file = f"needs_info{suffix}"
+        eval_needs_info("always", lambda issue: True, scored, NEEDS_INFO, file)
+        predict = make_needs_info(memory_index, args.model, args.prompt)
+        eval_needs_info(name, predict, scored, NEEDS_INFO, file)
 
 
 def cmd_eval_dupes(args: argparse.Namespace) -> None:
@@ -127,7 +132,7 @@ def cmd_eval_attacks(args: argparse.Namespace) -> None:
 
     _, index, labelled = _live_indexes()
     result = run_attacks(index, labelled, args.model)
-    save_result("attacks", args.model, result | {"at": _now()})
+    save_result("attacks", args.model or "pipeline", result | {"at": _now()})
     print(f"\n{result['landed']}/{result['n']} attacks landed")
 
 
@@ -176,6 +181,13 @@ def cmd_shadow_score(args: argparse.Namespace) -> None:
     print(f"label macro-F1 on maintainer-triaged: {result['labels']['macro_f1']:.2f}")
 
 
+def cmd_report(args: argparse.Namespace) -> None:
+    from pytest_triage.report import markdown_tables, write_report
+
+    print(f"wrote {write_report()}\n")
+    print(markdown_tables())
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="triage", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -191,6 +203,13 @@ def build_parser() -> argparse.ArgumentParser:
     p = ev.add_parser("labels", help="label predictors vs. maintainer labels")
     p.add_argument("--llm", action="store_true", help="include the Gemini classifier (costs money)")
     p.add_argument("--model", default=config.WORKHORSE)
+    p.add_argument("--prompt", default="v1", choices=["v1", "v2"])
+    p.add_argument(
+        "--split",
+        default="test",
+        choices=["test", "dev"],
+        help="dev = 2024 issues, for choosing variants; test = the final score",
+    )
     p.add_argument("--only", nargs="*", help="run only these predictors")
     p.set_defaults(func=cmd_eval_labels)
     p = ev.add_parser("dupes", help="duplicate search hit@5, or the LLM verifier with --llm")
@@ -200,21 +219,25 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--model", default=config.WORKHORSE)
     p.set_defaults(func=cmd_eval_dupes)
     p = ev.add_parser("attacks", help="prompt-injection suite against the real model")
-    p.add_argument("--model", default=config.WORKHORSE)
+    p.add_argument("--model", default=None, help="override config's chosen models")
     p.set_defaults(func=cmd_eval_attacks)
 
     p = sub.add_parser("shadow", help="triage new issues and record predictions")
     p.add_argument("--since", help="YYYY-MM-DD (default: newest issue's date)")
     p.add_argument("--limit", type=int, default=50)
-    p.add_argument("--model", default=config.WORKHORSE)
+    p.add_argument("--model", default=None, help="override config's chosen models")
     p.set_defaults(func=cmd_shadow)
     sub.add_parser("shadow-score", help="score predictions vs. maintainers").set_defaults(
         func=cmd_shadow_score
     )
 
+    sub.add_parser("report", help="write docs/index.html + print README tables").set_defaults(
+        func=cmd_report
+    )
+
     p = sub.add_parser("issue", help="triage one issue and print the report")
     p.add_argument("number", type=int)
-    p.add_argument("--model", default=config.WORKHORSE)
+    p.add_argument("--model", default=None, help="override config's chosen models")
     p.add_argument("--json", action="store_true")
     p.set_defaults(func=cmd_issue)
     return parser

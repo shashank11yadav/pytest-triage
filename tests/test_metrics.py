@@ -62,3 +62,11 @@ def test_keyword_predictor_matches_title_words_case_insensitively():
     predict = baselines.make_keyword_predictor({"type: docs": ["typo"], "type: bug": ["crash"]})
     assert predict(issue(title="Typo in README")) == {"type: docs"}
     assert predict(issue(labels=["type: bug"], title="segfault")) == set()  # never reads labels
+
+
+def test_duplicate_clusters_join_transitive_pairs():
+    from pytest_triage.metrics import duplicate_clusters
+
+    clusters = duplicate_clusters({14997: [14635], 15071: [14635], 7: [8]})
+    assert clusters[15071] == {14997, 15071, 14635}
+    assert clusters[7] == {7, 8}
