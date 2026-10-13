@@ -35,6 +35,7 @@ def test_score_counts_untriaged_and_scores_only_triaged():
     assert result["needs_info"]["precision"] == 1.0
     assert result["flagged_and_closed_duplicate"] == [3]
     assert result["cost_usd_total"] == 0.003
+    assert result["predicted_before_any_maintainer_label"] == 3  # no labels_at_prediction
 
 
 def test_predictions_for_unknown_issues_are_ignored():

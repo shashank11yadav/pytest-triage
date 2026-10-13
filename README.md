@@ -7,7 +7,10 @@ For each new issue it suggests labels, flags missing information, finds possible
 duplicates for a maintainer to review, and drafts a reply. It reads from GitHub
 and **never writes to it**.
 
-[![CI](https://github.com/OWNER/pytest-triage/actions/workflows/ci.yml/badge.svg)](.github/workflows/ci.yml)
+[![CI](https://github.com/shashank11yadav/pytest-triage/actions/workflows/ci.yml/badge.svg)](https://github.com/shashank11yadav/pytest-triage/actions/workflows/ci.yml)
+[![Shadow](https://github.com/shashank11yadav/pytest-triage/actions/workflows/shadow.yml/badge.svg)](https://github.com/shashank11yadav/pytest-triage/actions/workflows/shadow.yml)
+
+**Live results:** https://shashank11yadav.github.io/pytest-triage/
 
 ## Why
 
@@ -90,8 +93,9 @@ to each other, whether each label actually fits the issue:
 | Strictest: correct only if both agree | 38% | 0.65 |
 
 The raters agreed on 34 of 50 items (Cohen's kappa 0.41, moderate).
-**Both raters are AI, and no human rated these.** Gemini is judging labels
-from its own model family. Read **about 0.65–0.75** as an indication of real
+**Both raters are LLMs, and no human rated these.** Gemini is judging labels
+from its own model family. Rater A was not blind to how the classifier
+prompt was designed. Read **about 0.65–0.75** as an indication of real
 precision, not a measurement.
 
 The labels both raters called wrong fall into three patterns:
@@ -292,11 +296,28 @@ new issue
 - **The attack suite was written by the defender.** It also found 2 real
   weaknesses. A suite written by someone else would be stronger evidence.
 - **The backtest is not a true prospective run.** The predictions were made
-  after the issues were opened, and with the earlier fused duplicate pool. A
-  scheduled `triage shadow` run is the honest version, and needs weeks of
-  data.
+  after the issues were opened, with the older v2 prompt and the fused
+  duplicate pool. They are kept separately in `eval/shadow/backtest.jsonl`.
+  The honest version, the daily prospective run below, needs weeks of data.
 - **No maintainer has used it yet.** Usefulness is inferred from metrics, not
   observed.
+
+## Shadow mode (live)
+
+A scheduled GitHub Actions job (`.github/workflows/shadow.yml`) runs once a
+day:
+
+1. Fetch new pytest issues.
+2. Triage every issue opened since **2026-10-14** that hasn't been predicted
+   yet. Each prediction is made within about a day of the issue opening,
+   usually before any maintainer label.
+3. Re-score all predictions against what maintainers have done since.
+4. Commit the results: `eval/shadow/predictions.jsonl` (issue numbers and
+   enum outputs only) and the regenerated results page.
+
+Because each prediction is committed when it's made, it's timestamped and
+can't be edited later. The job has its own $1.00 spend cap and costs about
+$0.05 a month. It reads pytest's public issues and never writes to them.
 
 ## Run it
 
@@ -315,7 +336,7 @@ uv run triage eval rerank           # local rerankers vs. the union candidate po
 uv run triage issue 14476           # triage one issue
 uv run triage shadow --since 2026-10-01 && uv run triage shadow-score
 uv run triage audit rate --rater YOU # blind human audit of "false positive" labels
-uv run triage audit rate-ai         # blind AI second rater (gemini-3.8-flash)
+uv run triage audit rate-ai         # blind LLM second rater (gemini-3.8-flash)
 uv run triage audit score           # adjusted precision + agreement between raters
 uv run triage report                # docs/index.html + these tables
 uv run pytest && uv run ruff check .

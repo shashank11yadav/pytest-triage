@@ -16,10 +16,12 @@ from pytest_triage.dataset import is_evaluable, targets
 from pytest_triage.metrics import confusion, label_report, prf
 from pytest_triage.search import IssueIndex
 
-PREDICTIONS = SHADOW / "predictions.jsonl"
+PREDICTIONS = SHADOW / "predictions.jsonl"  # prospective, from SHADOW_START
+BACKTEST = SHADOW / "backtest.jsonl"  # after-the-fact, 2026-09-01..10-07, prompt v2
 
 
 def load_predictions(path: Path = PREDICTIONS) -> list[dict]:
+    """Predictions from a JSONL file (prospective by default)."""
     if not path.exists():
         return []
     with path.open() as f:
@@ -53,6 +55,9 @@ def run_shadow(
             {
                 "number": issue["number"],
                 "created_at": issue["created_at"],
+                # Maintainer labels already present when we predicted. The model never
+                # sees them; recorded to show how often we got there first.
+                "labels_at_prediction": issue["labels"],
                 "predicted_at": datetime.now(UTC).isoformat(timespec="seconds"),
                 "models": report["models"],
                 "labels": report["labels"],
@@ -86,7 +91,9 @@ def score_shadow(predictions: list[dict], issues: list[dict]) -> dict:
     closed_dupe = [i["number"] for _, i in rows if i["state_reason"] == "duplicate"]
     flagged = [p["number"] for p, _ in rows if p["duplicates"]]
     latencies = sorted(p["latency_s"] for p, _ in rows)
+    first = sum(1 for p, _ in rows if not p.get("labels_at_prediction", []))
     return {
+        "predicted_before_any_maintainer_label": first,
         "predicted": len(rows),
         "maintainer_triaged": len(triaged),
         "still_untriaged": len(rows) - len(triaged),

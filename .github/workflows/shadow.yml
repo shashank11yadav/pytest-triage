@@ -1,0 +1,57 @@
+# Prospective shadow mode: once a day, triage every pytest issue opened since
+# SHADOW_START that hasn't been predicted yet, re-score all predictions against
+# what maintainers have done since, and commit the results (issue numbers, enum
+# outputs and metrics only - never issue text). Read-only toward pytest-dev/pytest.
+name: Shadow
+
+on:
+  schedule:
+    - cron: "17 6 * * *" # daily, 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write # to commit eval/ and docs/ back to this repo
+
+concurrency:
+  group: shadow
+  cancel-in-progress: false
+
+jobs:
+  shadow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GITHUB_TOKEN: ${{ github.token }} # read pytest's public issues
+      TRIAGE_SPEND_CAP_USD: "1.00" # hard cap for the job's own ledger
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+      # Issue snapshot, embeddings, LLM cache and cost ledger persist between runs.
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: data
+          key: shadow-data-${{ github.run_id }}
+          restore-keys: shadow-data-
+      - run: uv sync --locked
+      - name: Triage new issues and score
+        run: |
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo "::notice::GEMINI_API_KEY secret not set - skipping shadow run."
+            exit 0
+          fi
+          uv run triage fetch
+          uv run triage shadow --limit 60
+          uv run triage shadow-score
+          uv run triage report
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add eval/shadow eval/results/shadow.json docs
+          if git diff --cached --quiet; then
+            echo "No new predictions."
+          else
+            git commit -m "Shadow run $(date -u +%Y-%m-%d)"
+            git push
+          fi

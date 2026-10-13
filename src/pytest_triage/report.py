@@ -134,28 +134,7 @@ def html_page() -> str:
         ]
         sections.append("<h2>Prompt injection</h2>" + _table(["Attack", "Result", "Flagged"], rows))
     if shadow:
-        s = shadow["latest"]
-        sections.append(
-            "<h2>Shadow mode</h2>"
-            f"<p>{s['predicted']} new issues triaged as they arrived; maintainers have since "
-            f"triaged {s['maintainer_triaged']}, {s['still_untriaged']} remain untriaged. "
-            f"Label macro-F1 on those triaged: {s['labels']['macro_f1']:.2f}. "
-            f"Median latency {s['latency_p50_s']}s; total cost ${s['cost_usd_total']}.</p>"
-        )
-        preds = []
-        path = SHADOW / "predictions.jsonl"
-        if path.exists():
-            preds = [json.loads(line) for line in path.read_text().splitlines()][-30:]
-        rows = [
-            [
-                f'<a href="{ISSUE_URL}{p["number"]}">#{p["number"]}</a>',
-                html.escape(", ".join(p["labels"]) or "-"),
-                "yes" if p["needs_info"] else "",
-                ", ".join(f"#{n}" for n in p["duplicates"]),
-            ]
-            for p in reversed(preds)
-        ]
-        sections.append(_table(["Issue", "Predicted labels", "Needs info", "Duplicate of"], rows))
+        sections.append(_shadow_section(shadow))
 
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
@@ -183,6 +162,49 @@ against what maintainers actually did. It never posts to GitHub.</p>
 {"".join(f'<div class="wrap">{s}</div>' for s in sections)}
 </main></body></html>
 """
+
+
+def _shadow_section(shadow: dict) -> str:
+    from pytest_triage.config import SHADOW_START
+
+    out = ["<h2>Shadow mode (prospective)</h2>"]
+    s = shadow.get("prospective")
+    if s:
+        out.append(
+            f"<p>Since {SHADOW_START}, a daily job triages each new issue within about a day "
+            f"of it opening. {s['predicted']} predicted so far; maintainers have since triaged "
+            f"{s['maintainer_triaged']}, {s['still_untriaged']} remain untriaged. Label "
+            f"macro-F1 on those triaged: {s['labels']['macro_f1']:.2f} (small n while the "
+            f"run is young). Median latency {s['latency_p50_s']}s; total cost "
+            f"${s['cost_usd_total']}.</p>"
+        )
+    else:
+        out.append(f"<p>Running daily from {SHADOW_START}; no predictions scored yet.</p>")
+    path = SHADOW / "predictions.jsonl"
+    preds = (
+        [json.loads(line) for line in path.read_text().splitlines()][-30:] if path.exists() else []
+    )
+    if preds:
+        rows = [
+            [
+                f'<a href="{ISSUE_URL}{p["number"]}">#{p["number"]}</a>',
+                html.escape(", ".join(p["labels"]) or "-"),
+                "yes" if p["needs_info"] else "",
+                ", ".join(f"#{n}" for n in p["duplicates"]),
+            ]
+            for p in reversed(preds)
+        ]
+        out.append(
+            _table(["Issue", "Suggested labels", "Needs info?", "Possible duplicate of"], rows)
+        )
+    b = shadow.get("backtest")
+    if b:
+        out.append(
+            f"<p>Earlier backtest (predicted after the fact, older pipeline): {b['predicted']} "
+            f"issues from 2026-09-01 to 2026-10-07, of which {b['still_untriaged']} were still "
+            f"untriaged by maintainers when scored.</p>"
+        )
+    return "".join(out)
 
 
 def write_report() -> Path:

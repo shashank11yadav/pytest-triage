@@ -290,19 +290,26 @@ def cmd_shadow(args: argparse.Namespace) -> None:
     from pytest_triage.shadow import run_shadow
 
     issues, index, labelled = _live_indexes()
-    since = args.since or max(i["created_at"] for i in issues)[:10]
+    since = args.since or config.SHADOW_START
     n = run_shadow(issues, index, labelled, since=since, limit=args.limit, model=args.model)
     print(f"{n} new predictions -> {config.SHADOW / 'predictions.jsonl'}")
 
 
 def cmd_shadow_score(args: argparse.Namespace) -> None:
     from pytest_triage.evaluate import _now, save_result
-    from pytest_triage.shadow import load_predictions, score_shadow
+    from pytest_triage.shadow import BACKTEST, PREDICTIONS, load_predictions, score_shadow
 
-    result = score_shadow(load_predictions(), store.load_issues())
-    save_result("shadow", "latest", result | {"at": _now()})
-    print(json.dumps({k: v for k, v in result.items() if k != "labels"}, indent=2))
-    print(f"label macro-F1 on maintainer-triaged: {result['labels']['macro_f1']:.2f}")
+    issues = store.load_issues()
+    for key, path in (("prospective", PREDICTIONS), ("backtest", BACKTEST)):
+        predictions = load_predictions(path)
+        if not predictions:
+            print(f"{key}: no predictions yet")
+            continue
+        result = score_shadow(predictions, issues)
+        save_result("shadow", key, result | {"at": _now(), "since": predictions[0]["created_at"]})
+        print(f"== {key}")
+        print(json.dumps({k: v for k, v in result.items() if k != "labels"}, indent=2))
+        print(f"label macro-F1 on maintainer-triaged: {result['labels']['macro_f1']:.2f}")
 
 
 def cmd_audit(args: argparse.Namespace) -> None:
@@ -428,7 +435,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.set_defaults(func=cmd_eval_attacks)
 
     p = sub.add_parser("shadow", help="triage new issues and record predictions")
-    p.add_argument("--since", help="YYYY-MM-DD (default: newest issue's date)")
+    p.add_argument("--since", help=f"YYYY-MM-DD (default: {config.SHADOW_START})")
     p.add_argument("--limit", type=int, default=50)
     p.add_argument("--model", default=None, help="override config's chosen models")
     p.set_defaults(func=cmd_shadow)

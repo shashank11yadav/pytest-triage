@@ -90,7 +90,14 @@ THINKING_HEADROOM = {WORKHORSE: 0, STEP_UP: 1024}
 REPLY_MIN_PRECISION = 0.70
 MEASURED_PRECISION = {"missing": 0.48, "duplicates": 0.50}
 
-SPEND_CAP_USD = 5.00  # whole project; calls past this are refused, not made
+# Whole project; calls past this are refused, not made. The scheduled shadow job sets
+# a lower cap through the environment (its ledger lives in the Actions cache).
+SPEND_CAP_USD = float(os.environ.get("TRIAGE_SPEND_CAP_USD", "5.00"))
+
+# Prospective shadow mode: issues opened on/after this date are triaged by the daily
+# job, within ~24h of opening. The earlier backtest (eval/shadow/backtest.jsonl) was
+# predicted after the fact with an older pipeline and is kept separate.
+SHADOW_START = "2026-10-14"
 
 
 # --- secrets ----------------------------------------------------------------
