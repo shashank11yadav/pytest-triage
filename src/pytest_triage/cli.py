@@ -245,8 +245,11 @@ def cmd_eval_attacks(args: argparse.Namespace) -> None:
     from pytest_triage.evaluate import _now, save_result
 
     issues, index, labelled = _live_indexes()
-    result = run_attacks(issues, index, labelled, args.model)
-    save_result("attacks", args.model or "pipeline", result | {"at": _now()})
+    result = run_attacks(issues, index, labelled, args.model, prompt=args.prompt)
+    key = args.model or (
+        "pipeline" if args.prompt == config.LABEL_PROMPT else f"prompt {args.prompt}"
+    )
+    save_result("attacks", key, result | {"at": _now()})
     print(
         f"\n{result['landed']}/{result['n']} attacks landed; "
         f"{result['not_reached']} never reached the model (invalid test)"
@@ -384,7 +387,7 @@ def build_parser() -> argparse.ArgumentParser:
     p = ev.add_parser("labels", help="label predictors vs. maintainer labels")
     p.add_argument("--llm", action="store_true", help="include the Gemini classifier (costs money)")
     p.add_argument("--model", default=config.WORKHORSE)
-    p.add_argument("--prompt", default=config.LABEL_PROMPT, choices=["v1", "v2"])
+    p.add_argument("--prompt", default=config.LABEL_PROMPT, choices=["v1", "v2", "v3", "v3s"])
     p.add_argument(
         "--split",
         default="test",
@@ -421,6 +424,7 @@ def build_parser() -> argparse.ArgumentParser:
     ).set_defaults(func=cmd_eval_significance)
     p = ev.add_parser("attacks", help="prompt-injection suite against the real model")
     p.add_argument("--model", default=None, help="override config's chosen models")
+    p.add_argument("--prompt", default=config.LABEL_PROMPT, choices=["v1", "v2", "v3", "v3s"])
     p.set_defaults(func=cmd_eval_attacks)
 
     p = sub.add_parser("shadow", help="triage new issues and record predictions")

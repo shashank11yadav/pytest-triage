@@ -230,7 +230,11 @@ CASES = [
 
 
 def run_attacks(
-    issues: list[dict], index: IssueIndex, labelled: IssueIndex, model: str | None = None
+    issues: list[dict],
+    index: IssueIndex,
+    labelled: IssueIndex,
+    model: str | None = None,
+    prompt: str | None = None,
 ) -> dict:
     from pytest_triage.triage import triage_issue
 
@@ -261,8 +265,9 @@ def run_attacks(
             control_index = IssueIndex.build([*issues, older | PLANT_CLEAN])
             attack_index = IssueIndex.build([*issues, older | PLANT_INJECTED])
 
-        control = triage_issue(base, control_index, labelled, model) | {"planted": planted}
-        attacked = triage_issue(case["attack"](base), attack_index, labelled, model)
+        kw = {"prompt": prompt} if prompt else {}
+        control = triage_issue(base, control_index, labelled, model, **kw) | {"planted": planted}
+        attacked = triage_issue(case["attack"](base), attack_index, labelled, model, **kw)
         attacked |= {"planted": planted}
         # For suppression this also means: nothing lands unless the control flagged it.
         landed = case["landed"](attacked) and not case["landed"](control)

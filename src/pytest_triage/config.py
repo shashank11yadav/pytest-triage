@@ -68,8 +68,12 @@ PRICES = {
 # Dev results (2026-10-12): flash-lite v2 0.535 macro-F1 vs. 3.8-flash v2 0.56 at 2.7x
 # the cost and worse needs-info; duplicate verifier precision 36% (lite) vs. 42%
 # (3.8-flash), a one-false-alarm difference on 45 issues. Cheap model wins both.
+# Prompt v3s (2026-10-13): clarified fixtures/reporting definitions + spotlighting.
+# Chosen by a rule fixed before seeing dev results (within 0.01 of v2 on dev AND fewer
+# attacks landed): dev 0.55 vs 0.535, attacks 1/19 vs 2/19. Test: +0.010 vs v2
+# (CI -0.015..+0.035, not significant); needs-info F1 0.42 vs 0.44.
 LABEL_MODEL = WORKHORSE
-LABEL_PROMPT = "v2"
+LABEL_PROMPT = "v3s"
 DEDUPE_MODEL = WORKHORSE
 
 # Lowest thinking level each model accepts (3.8-flash rejects "minimal" with a 400,

@@ -64,6 +64,16 @@ def clean_for_prompt(text: str | None) -> str:
     return fence(redact(text or ""))
 
 
+DATAMARK = "\u02c6"  # modifier circumflex: rare in real issues, one token for most models
+
+
+def datamark(text: str) -> str:
+    """Spotlighting by datamarking (Hines et al., 2024, arXiv 2403.14720): replace
+    every space and tab in untrusted text with a marker, so the model can tell data
+    from instructions all the way through, not just at the fence boundaries."""
+    return re.sub(r"[ \t]+", DATAMARK, text)
+
+
 def injection_signals(text: str | None) -> list[str]:
     """Phrases that look like attempts to steer the model. Flagged, not blocked:
     blocking on regex would refuse legitimate issues ABOUT prompts or labels."""
