@@ -60,6 +60,7 @@ def run_shadow(
                 "labels_at_prediction": issue["labels"],
                 "predicted_at": datetime.now(UTC).isoformat(timespec="seconds"),
                 "models": report["models"],
+                "route": report["route"],
                 "labels": report["labels"],
                 "needs_info": bool(report["missing"]),
                 "duplicates": report["duplicates"],
@@ -95,6 +96,7 @@ def score_shadow(predictions: list[dict], issues: list[dict]) -> dict:
     return {
         "predicted_before_any_maintainer_label": first,
         "predicted": len(rows),
+        "routed_to_human": sum(p.get("route") == "human" for p, _ in rows),
         "maintainer_triaged": len(triaged),
         "still_untriaged": len(rows) - len(triaged),
         "labels": labels,

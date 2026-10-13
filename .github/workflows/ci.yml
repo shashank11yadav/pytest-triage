@@ -1,4 +1,4 @@
-# Lint + offline tests on every push and PR. No secrets, no network calls, no cost.
+# Lint, offline tests and the regression gate on every push and PR. No secrets, no network, no cost.
 name: CI
 
 on:
@@ -19,4 +19,8 @@ jobs:
       - run: uv sync --locked
       - run: uv run ruff check .
       - run: uv run ruff format --check .
-      - run: uv run pytest -q
+      - run: uv run pytest -q --ignore=tests/test_regression.py
+      # Fails when a prompt, model or guard change hasn't been re-measured, or when
+      # post-processing lowers the frozen dev scores. See src/pytest_triage/regression.py.
+      - name: Regression gate
+        run: uv run pytest -q tests/test_regression.py

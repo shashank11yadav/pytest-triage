@@ -122,3 +122,41 @@ def bootstrap_diff(
         "p_not_better": sum(d <= 0 for d in diffs) / rounds,
         "rounds": rounds,
     }
+
+
+def selective_curve(
+    truth: list[set[str]],
+    suggested: list[set[str]],
+    confidence: list[dict[str, float]],
+    thresholds: Iterable[float],
+) -> list[dict]:
+    """Precision vs. coverage when a suggestion is shown only if its confidence
+    is >= t. At each t: label precision and recall (micro, vs. maintainer labels),
+    the share of issues still getting at least one suggestion, and the share of
+    suggested labels kept."""
+    total = sum(len(s) for s in suggested)
+    curve = []
+    for t in thresholds:
+        kept = [
+            {lbl for lbl in s if c[lbl] >= t} for s, c in zip(suggested, confidence, strict=True)
+        ]
+        tp = sum(len(k & tr) for k, tr in zip(kept, truth, strict=True))
+        fp = sum(len(k - tr) for k, tr in zip(kept, truth, strict=True))
+        fn = sum(len(tr - k) for k, tr in zip(kept, truth, strict=True))
+        p, r, _ = prf(tp, fp, fn)
+        curve.append(
+            {
+                "threshold": round(t, 2),
+                "precision": round(p, 4),
+                "recall": round(r, 4),
+                "issue_coverage": round(sum(bool(k) for k in kept) / len(kept), 4),
+                "labels_kept": round((tp + fp) / total, 4) if total else 0.0,
+                "precision_ci95": [round(x, 4) for x in wilson(tp, tp + fp)],
+            }
+        )
+    return curve
+
+
+def operating_point(curve: list[dict], min_precision: float) -> dict | None:
+    """The lowest threshold whose precision reaches `min_precision` (most coverage)."""
+    return next((c for c in curve if c["precision"] >= min_precision), None)

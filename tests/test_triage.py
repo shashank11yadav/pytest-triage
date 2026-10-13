@@ -47,9 +47,25 @@ def test_triage_issue_assembles_report(monkeypatch):
     )
     monkeypatch.setattr(triage.llm, "spent", lambda: 0.0)
     out = triage.triage_issue(issue, index, index)
-    assert out["labels"] == ["type: bug"]
-    assert out["injection_signals"]  # flagged for the human reviewer
-    assert out["missing"] == ["pytest and Python versions"]
-    assert out["reply_draft"] == ""  # below the precision bar: maintainer view only
+    assert out["injection_signals"]  # flagged, so routed to a human with no suggestions
+    assert out["route"] == "human"
+    assert out["labels"] == [] and out["missing"] == []
+    assert out["raw"]["labels"] == ["type: bug"]  # kept for the trace
+    assert out["reply_draft"] == ""
+    assert out["warnings"] == []
     assert out["trace"]["cost_usd"] == 0.0
     assert out["candidate_injection_signals"] == {}
+
+
+def test_clean_issue_gets_suggestions(monkeypatch):
+    issue = {"number": 9, "title": "crash", "body": "it crashes", "created_at": "2026-01-01"}
+    index = IssueIndex([issue | {"labels": []}], np.array([[1.0, 0.0]], dtype=np.float32))
+    monkeypatch.setattr(triage, "assess", lambda *a, **k: {"labels": {"type: bug"}, "missing": []})
+    monkeypatch.setattr(
+        triage,
+        "find_duplicates",
+        lambda *a, **k: {"duplicates": [], "verdicts": [], "candidates": [], "queries": []},
+    )
+    monkeypatch.setattr(triage.llm, "spent", lambda: 0.0)
+    out = triage.triage_issue(issue, index, index)
+    assert out["route"] == "suggest" and out["labels"] == ["type: bug"]

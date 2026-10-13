@@ -1,0 +1,948 @@
+{
+  "dev": {
+    "at": "2026-10-13T20:57:45+00:00",
+    "chosen_on_dev": {
+      "llm gated by logreg p": {
+        "issue_coverage": 0.2383,
+        "labels_kept": 0.1749,
+        "precision": 0.7463,
+        "precision_ci95": [
+          0.6307,
+          0.8351
+        ],
+        "recall": 0.2083,
+        "threshold": 0.9
+      },
+      "logreg p alone": {
+        "issue_coverage": 0.2656,
+        "labels_kept": 0.0289,
+        "precision": 0.7027,
+        "precision_ci95": [
+          0.5907,
+          0.7947
+        ],
+        "recall": 0.2167,
+        "threshold": 0.9
+      }
+    },
+    "llm gated by logreg p": [
+      {
+        "issue_coverage": 0.9531,
+        "labels_kept": 1.0,
+        "precision": 0.4439,
+        "precision_ci95": [
+          0.3949,
+          0.4939
+        ],
+        "recall": 0.7083,
+        "threshold": 0.0
+      },
+      {
+        "issue_coverage": 0.9531,
+        "labels_kept": 1.0,
+        "precision": 0.4439,
+        "precision_ci95": [
+          0.3949,
+          0.4939
+        ],
+        "recall": 0.7083,
+        "threshold": 0.05
+      },
+      {
+        "issue_coverage": 0.9531,
+        "labels_kept": 1.0,
+        "precision": 0.4439,
+        "precision_ci95": [
+          0.3949,
+          0.4939
+        ],
+        "recall": 0.7083,
+        "threshold": 0.1
+      },
+      {
+        "issue_coverage": 0.9492,
+        "labels_kept": 0.9896,
+        "precision": 0.4485,
+        "precision_ci95": [
+          0.3992,
+          0.4989
+        ],
+        "recall": 0.7083,
+        "threshold": 0.15
+      },
+      {
+        "issue_coverage": 0.9297,
+        "labels_kept": 0.9687,
+        "precision": 0.4528,
+        "precision_ci95": [
+          0.4029,
+          0.5037
+        ],
+        "recall": 0.7,
+        "threshold": 0.2
+      },
+      {
+        "issue_coverage": 0.9219,
+        "labels_kept": 0.953,
+        "precision": 0.4603,
+        "precision_ci95": [
+          0.4098,
+          0.5116
+        ],
+        "recall": 0.7,
+        "threshold": 0.25
+      },
+      {
+        "issue_coverage": 0.9102,
+        "labels_kept": 0.9243,
+        "precision": 0.4633,
+        "precision_ci95": [
+          0.412,
+          0.5153
+        ],
+        "recall": 0.6833,
+        "threshold": 0.3
+      },
+      {
+        "issue_coverage": 0.8984,
+        "labels_kept": 0.9008,
+        "precision": 0.4638,
+        "precision_ci95": [
+          0.4118,
+          0.5165
+        ],
+        "recall": 0.6667,
+        "threshold": 0.35
+      },
+      {
+        "issue_coverage": 0.8633,
+        "labels_kept": 0.8616,
+        "precision": 0.4727,
+        "precision_ci95": [
+          0.4195,
+          0.5266
+        ],
+        "recall": 0.65,
+        "threshold": 0.4
+      },
+      {
+        "issue_coverage": 0.832,
+        "labels_kept": 0.8277,
+        "precision": 0.4858,
+        "precision_ci95": [
+          0.4313,
+          0.5407
+        ],
+        "recall": 0.6417,
+        "threshold": 0.45
+      },
+      {
+        "issue_coverage": 0.8047,
+        "labels_kept": 0.7833,
+        "precision": 0.5,
+        "precision_ci95": [
+          0.4438,
+          0.5562
+        ],
+        "recall": 0.625,
+        "threshold": 0.5
+      },
+      {
+        "issue_coverage": 0.7578,
+        "labels_kept": 0.7128,
+        "precision": 0.5165,
+        "precision_ci95": [
+          0.4574,
+          0.5751
+        ],
+        "recall": 0.5875,
+        "threshold": 0.55
+      },
+      {
+        "issue_coverage": 0.6914,
+        "labels_kept": 0.6371,
+        "precision": 0.541,
+        "precision_ci95": [
+          0.4783,
+          0.6024
+        ],
+        "recall": 0.55,
+        "threshold": 0.6
+      },
+      {
+        "issue_coverage": 0.6367,
+        "labels_kept": 0.5744,
+        "precision": 0.55,
+        "precision_ci95": [
+          0.484,
+          0.6143
+        ],
+        "recall": 0.5042,
+        "threshold": 0.65
+      },
+      {
+        "issue_coverage": 0.5938,
+        "labels_kept": 0.5144,
+        "precision": 0.5635,
+        "precision_ci95": [
+          0.4936,
+          0.6308
+        ],
+        "recall": 0.4625,
+        "threshold": 0.7
+      },
+      {
+        "issue_coverage": 0.5039,
+        "labels_kept": 0.4099,
+        "precision": 0.5987,
+        "precision_ci95": [
+          0.5206,
+          0.6722
+        ],
+        "recall": 0.3917,
+        "threshold": 0.75
+      },
+      {
+        "issue_coverage": 0.418,
+        "labels_kept": 0.3368,
+        "precision": 0.6667,
+        "precision_ci95": [
+          0.5815,
+          0.7422
+        ],
+        "recall": 0.3583,
+        "threshold": 0.8
+      },
+      {
+        "issue_coverage": 0.332,
+        "labels_kept": 0.248,
+        "precision": 0.6632,
+        "precision_ci95": [
+          0.5634,
+          0.7502
+        ],
+        "recall": 0.2625,
+        "threshold": 0.85
+      },
+      {
+        "issue_coverage": 0.2383,
+        "labels_kept": 0.1749,
+        "precision": 0.7463,
+        "precision_ci95": [
+          0.6307,
+          0.8351
+        ],
+        "recall": 0.2083,
+        "threshold": 0.9
+      },
+      {
+        "issue_coverage": 0.1367,
+        "labels_kept": 0.094,
+        "precision": 0.7778,
+        "precision_ci95": [
+          0.6191,
+          0.8828
+        ],
+        "recall": 0.1167,
+        "threshold": 0.95
+      }
+    ],
+    "logreg p alone": [
+      {
+        "issue_coverage": 1.0,
+        "labels_kept": 1.0,
+        "precision": 0.0938,
+        "precision_ci95": [
+          0.0831,
+          0.1057
+        ],
+        "recall": 1.0,
+        "threshold": 0.0
+      },
+      {
+        "issue_coverage": 1.0,
+        "labels_kept": 0.8043,
+        "precision": 0.1156,
+        "precision_ci95": [
+          0.1025,
+          0.1301
+        ],
+        "recall": 0.9917,
+        "threshold": 0.05
+      },
+      {
+        "issue_coverage": 1.0,
+        "labels_kept": 0.6652,
+        "precision": 0.1374,
+        "precision_ci95": [
+          0.1219,
+          0.1546
+        ],
+        "recall": 0.975,
+        "threshold": 0.1
+      },
+      {
+        "issue_coverage": 1.0,
+        "labels_kept": 0.5625,
+        "precision": 0.159,
+        "precision_ci95": [
+          0.141,
+          0.1788
+        ],
+        "recall": 0.9542,
+        "threshold": 0.15
+      },
+      {
+        "issue_coverage": 1.0,
+        "labels_kept": 0.4898,
+        "precision": 0.1794,
+        "precision_ci95": [
+          0.1592,
+          0.2016
+        ],
+        "recall": 0.9375,
+        "threshold": 0.2
+      },
+      {
+        "issue_coverage": 1.0,
+        "labels_kept": 0.4301,
+        "precision": 0.2025,
+        "precision_ci95": [
+          0.1799,
+          0.2273
+        ],
+        "recall": 0.9292,
+        "threshold": 0.25
+      },
+      {
+        "issue_coverage": 1.0,
+        "labels_kept": 0.3793,
+        "precision": 0.2225,
+        "precision_ci95": [
+          0.1974,
+          0.2497
+        ],
+        "recall": 0.9,
+        "threshold": 0.3
+      },
+      {
+        "issue_coverage": 0.9961,
+        "labels_kept": 0.3414,
+        "precision": 0.2414,
+        "precision_ci95": [
+          0.2142,
+          0.2709
+        ],
+        "recall": 0.8792,
+        "threshold": 0.35
+      },
+      {
+        "issue_coverage": 0.9883,
+        "labels_kept": 0.2984,
+        "precision": 0.2696,
+        "precision_ci95": [
+          0.2394,
+          0.3022
+        ],
+        "recall": 0.8583,
+        "threshold": 0.4
+      },
+      {
+        "issue_coverage": 0.9805,
+        "labels_kept": 0.2602,
+        "precision": 0.2988,
+        "precision_ci95": [
+          0.2653,
+          0.3346
+        ],
+        "recall": 0.8292,
+        "threshold": 0.45
+      },
+      {
+        "issue_coverage": 0.9531,
+        "labels_kept": 0.2254,
+        "precision": 0.331,
+        "precision_ci95": [
+          0.2939,
+          0.3704
+        ],
+        "recall": 0.7958,
+        "threshold": 0.5
+      },
+      {
+        "issue_coverage": 0.9336,
+        "labels_kept": 0.193,
+        "precision": 0.3623,
+        "precision_ci95": [
+          0.3212,
+          0.4056
+        ],
+        "recall": 0.7458,
+        "threshold": 0.55
+      },
+      {
+        "issue_coverage": 0.875,
+        "labels_kept": 0.1648,
+        "precision": 0.391,
+        "precision_ci95": [
+          0.3456,
+          0.4383
+        ],
+        "recall": 0.6875,
+        "threshold": 0.6
+      },
+      {
+        "issue_coverage": 0.8125,
+        "labels_kept": 0.1398,
+        "precision": 0.419,
+        "precision_ci95": [
+          0.369,
+          0.4707
+        ],
+        "recall": 0.625,
+        "threshold": 0.65
+      },
+      {
+        "issue_coverage": 0.7344,
+        "labels_kept": 0.1168,
+        "precision": 0.4515,
+        "precision_ci95": [
+          0.3961,
+          0.5082
+        ],
+        "recall": 0.5625,
+        "threshold": 0.7
+      },
+      {
+        "issue_coverage": 0.625,
+        "labels_kept": 0.0863,
+        "precision": 0.5023,
+        "precision_ci95": [
+          0.4369,
+          0.5676
+        ],
+        "recall": 0.4625,
+        "threshold": 0.75
+      },
+      {
+        "issue_coverage": 0.4961,
+        "labels_kept": 0.0625,
+        "precision": 0.6062,
+        "precision_ci95": [
+          0.5289,
+          0.6786
+        ],
+        "recall": 0.4042,
+        "threshold": 0.8
+      },
+      {
+        "issue_coverage": 0.3906,
+        "labels_kept": 0.0441,
+        "precision": 0.6283,
+        "precision_ci95": [
+          0.5364,
+          0.7118
+        ],
+        "recall": 0.2958,
+        "threshold": 0.85
+      },
+      {
+        "issue_coverage": 0.2656,
+        "labels_kept": 0.0289,
+        "precision": 0.7027,
+        "precision_ci95": [
+          0.5907,
+          0.7947
+        ],
+        "recall": 0.2167,
+        "threshold": 0.9
+      },
+      {
+        "issue_coverage": 0.1484,
+        "labels_kept": 0.0152,
+        "precision": 0.7692,
+        "precision_ci95": [
+          0.6166,
+          0.8735
+        ],
+        "recall": 0.125,
+        "threshold": 0.95
+      }
+    ],
+    "min_precision": 0.7,
+    "n": 256
+  },
+  "test": {
+    "at": "2026-10-13T20:57:58+00:00",
+    "chosen_on_dev": {
+      "llm gated by logreg p": {
+        "issue_coverage": 0.173,
+        "labels_kept": 0.1173,
+        "precision": 0.8182,
+        "precision_ci95": [
+          0.6804,
+          0.9049
+        ],
+        "recall": 0.15,
+        "threshold": 0.9
+      },
+      "logreg p alone": {
+        "issue_coverage": 0.1899,
+        "labels_kept": 0.0203,
+        "precision": 0.8125,
+        "precision_ci95": [
+          0.6806,
+          0.8981
+        ],
+        "recall": 0.1625,
+        "threshold": 0.9
+      }
+    },
+    "llm gated by logreg p": [
+      {
+        "issue_coverage": 0.9789,
+        "labels_kept": 1.0,
+        "precision": 0.4347,
+        "precision_ci95": [
+          0.3854,
+          0.4853
+        ],
+        "recall": 0.6792,
+        "threshold": 0.0
+      },
+      {
+        "issue_coverage": 0.9789,
+        "labels_kept": 1.0,
+        "precision": 0.4347,
+        "precision_ci95": [
+          0.3854,
+          0.4853
+        ],
+        "recall": 0.6792,
+        "threshold": 0.05
+      },
+      {
+        "issue_coverage": 0.9789,
+        "labels_kept": 0.9973,
+        "precision": 0.4358,
+        "precision_ci95": [
+          0.3865,
+          0.4865
+        ],
+        "recall": 0.6792,
+        "threshold": 0.1
+      },
+      {
+        "issue_coverage": 0.9747,
+        "labels_kept": 0.9893,
+        "precision": 0.4394,
+        "precision_ci95": [
+          0.3897,
+          0.4902
+        ],
+        "recall": 0.6792,
+        "threshold": 0.15
+      },
+      {
+        "issue_coverage": 0.962,
+        "labels_kept": 0.9733,
+        "precision": 0.4438,
+        "precision_ci95": [
+          0.3937,
+          0.4951
+        ],
+        "recall": 0.675,
+        "threshold": 0.2
+      },
+      {
+        "issue_coverage": 0.9451,
+        "labels_kept": 0.944,
+        "precision": 0.4463,
+        "precision_ci95": [
+          0.3954,
+          0.4984
+        ],
+        "recall": 0.6583,
+        "threshold": 0.25
+      },
+      {
+        "issue_coverage": 0.9114,
+        "labels_kept": 0.896,
+        "precision": 0.4524,
+        "precision_ci95": [
+          0.4,
+          0.5058
+        ],
+        "recall": 0.6333,
+        "threshold": 0.3
+      },
+      {
+        "issue_coverage": 0.8903,
+        "labels_kept": 0.8507,
+        "precision": 0.4577,
+        "precision_ci95": [
+          0.4038,
+          0.5125
+        ],
+        "recall": 0.6083,
+        "threshold": 0.35
+      },
+      {
+        "issue_coverage": 0.8734,
+        "labels_kept": 0.816,
+        "precision": 0.4673,
+        "precision_ci95": [
+          0.4122,
+          0.5233
+        ],
+        "recall": 0.5958,
+        "threshold": 0.4
+      },
+      {
+        "issue_coverage": 0.8143,
+        "labels_kept": 0.7413,
+        "precision": 0.482,
+        "precision_ci95": [
+          0.4239,
+          0.5406
+        ],
+        "recall": 0.5583,
+        "threshold": 0.45
+      },
+      {
+        "issue_coverage": 0.7637,
+        "labels_kept": 0.672,
+        "precision": 0.496,
+        "precision_ci95": [
+          0.4348,
+          0.5574
+        ],
+        "recall": 0.5208,
+        "threshold": 0.5
+      },
+      {
+        "issue_coverage": 0.7131,
+        "labels_kept": 0.608,
+        "precision": 0.5132,
+        "precision_ci95": [
+          0.4486,
+          0.5773
+        ],
+        "recall": 0.4875,
+        "threshold": 0.55
+      },
+      {
+        "issue_coverage": 0.6456,
+        "labels_kept": 0.528,
+        "precision": 0.5354,
+        "precision_ci95": [
+          0.4659,
+          0.6035
+        ],
+        "recall": 0.4417,
+        "threshold": 0.6
+      },
+      {
+        "issue_coverage": 0.5865,
+        "labels_kept": 0.4507,
+        "precision": 0.574,
+        "precision_ci95": [
+          0.4986,
+          0.6461
+        ],
+        "recall": 0.4042,
+        "threshold": 0.65
+      },
+      {
+        "issue_coverage": 0.5021,
+        "labels_kept": 0.3787,
+        "precision": 0.6127,
+        "precision_ci95": [
+          0.5306,
+          0.6888
+        ],
+        "recall": 0.3625,
+        "threshold": 0.7
+      },
+      {
+        "issue_coverage": 0.4177,
+        "labels_kept": 0.3093,
+        "precision": 0.6552,
+        "precision_ci95": [
+          0.565,
+          0.7354
+        ],
+        "recall": 0.3167,
+        "threshold": 0.75
+      },
+      {
+        "issue_coverage": 0.3165,
+        "labels_kept": 0.2267,
+        "precision": 0.7294,
+        "precision_ci95": [
+          0.6266,
+          0.8124
+        ],
+        "recall": 0.2583,
+        "threshold": 0.8
+      },
+      {
+        "issue_coverage": 0.2574,
+        "labels_kept": 0.1733,
+        "precision": 0.7692,
+        "precision_ci95": [
+          0.6536,
+          0.8549
+        ],
+        "recall": 0.2083,
+        "threshold": 0.85
+      },
+      {
+        "issue_coverage": 0.173,
+        "labels_kept": 0.1173,
+        "precision": 0.8182,
+        "precision_ci95": [
+          0.6804,
+          0.9049
+        ],
+        "recall": 0.15,
+        "threshold": 0.9
+      },
+      {
+        "issue_coverage": 0.0675,
+        "labels_kept": 0.0453,
+        "precision": 0.8824,
+        "precision_ci95": [
+          0.6566,
+          0.9671
+        ],
+        "recall": 0.0625,
+        "threshold": 0.95
+      }
+    ],
+    "logreg p alone": [
+      {
+        "issue_coverage": 1.0,
+        "labels_kept": 1.0,
+        "precision": 0.1013,
+        "precision_ci95": [
+          0.0898,
+          0.1141
+        ],
+        "recall": 1.0,
+        "threshold": 0.0
+      },
+      {
+        "issue_coverage": 1.0,
+        "labels_kept": 0.9342,
+        "precision": 0.1084,
+        "precision_ci95": [
+          0.0961,
+          0.122
+        ],
+        "recall": 1.0,
+        "threshold": 0.05
+      },
+      {
+        "issue_coverage": 1.0,
+        "labels_kept": 0.8148,
+        "precision": 0.1222,
+        "precision_ci95": [
+          0.1084,
+          0.1376
+        ],
+        "recall": 0.9833,
+        "threshold": 0.1
+      },
+      {
+        "issue_coverage": 1.0,
+        "labels_kept": 0.7025,
+        "precision": 0.1387,
+        "precision_ci95": [
+          0.123,
+          0.1562
+        ],
+        "recall": 0.9625,
+        "threshold": 0.15
+      },
+      {
+        "issue_coverage": 1.0,
+        "labels_kept": 0.6034,
+        "precision": 0.1587,
+        "precision_ci95": [
+          0.1407,
+          0.1786
+        ],
+        "recall": 0.9458,
+        "threshold": 0.2
+      },
+      {
+        "issue_coverage": 1.0,
+        "labels_kept": 0.5283,
+        "precision": 0.1741,
+        "precision_ci95": [
+          0.1541,
+          0.1961
+        ],
+        "recall": 0.9083,
+        "threshold": 0.25
+      },
+      {
+        "issue_coverage": 1.0,
+        "labels_kept": 0.4565,
+        "precision": 0.1913,
+        "precision_ci95": [
+          0.169,
+          0.2158
+        ],
+        "recall": 0.8625,
+        "threshold": 0.3
+      },
+      {
+        "issue_coverage": 0.9958,
+        "labels_kept": 0.3895,
+        "precision": 0.2167,
+        "precision_ci95": [
+          0.1913,
+          0.2444
+        ],
+        "recall": 0.8333,
+        "threshold": 0.35
+      },
+      {
+        "issue_coverage": 0.9916,
+        "labels_kept": 0.3325,
+        "precision": 0.2424,
+        "precision_ci95": [
+          0.2138,
+          0.2735
+        ],
+        "recall": 0.7958,
+        "threshold": 0.4
+      },
+      {
+        "issue_coverage": 0.9789,
+        "labels_kept": 0.2776,
+        "precision": 0.2705,
+        "precision_ci95": [
+          0.238,
+          0.3057
+        ],
+        "recall": 0.7417,
+        "threshold": 0.45
+      },
+      {
+        "issue_coverage": 0.9451,
+        "labels_kept": 0.2262,
+        "precision": 0.2929,
+        "precision_ci95": [
+          0.256,
+          0.3328
+        ],
+        "recall": 0.6542,
+        "threshold": 0.5
+      },
+      {
+        "issue_coverage": 0.8861,
+        "labels_kept": 0.1903,
+        "precision": 0.3193,
+        "precision_ci95": [
+          0.2779,
+          0.3637
+        ],
+        "recall": 0.6,
+        "threshold": 0.55
+      },
+      {
+        "issue_coverage": 0.8186,
+        "labels_kept": 0.157,
+        "precision": 0.3548,
+        "precision_ci95": [
+          0.3079,
+          0.4047
+        ],
+        "recall": 0.55,
+        "threshold": 0.6
+      },
+      {
+        "issue_coverage": 0.7257,
+        "labels_kept": 0.119,
+        "precision": 0.4255,
+        "precision_ci95": [
+          0.3692,
+          0.4839
+        ],
+        "recall": 0.5,
+        "threshold": 0.65
+      },
+      {
+        "issue_coverage": 0.6076,
+        "labels_kept": 0.0903,
+        "precision": 0.4953,
+        "precision_ci95": [
+          0.429,
+          0.5618
+        ],
+        "recall": 0.4417,
+        "threshold": 0.7
+      },
+      {
+        "issue_coverage": 0.4937,
+        "labels_kept": 0.0675,
+        "precision": 0.5625,
+        "precision_ci95": [
+          0.4851,
+          0.637
+        ],
+        "recall": 0.375,
+        "threshold": 0.75
+      },
+      {
+        "issue_coverage": 0.3882,
+        "labels_kept": 0.0477,
+        "precision": 0.646,
+        "precision_ci95": [
+          0.5544,
+          0.7281
+        ],
+        "recall": 0.3042,
+        "threshold": 0.8
+      },
+      {
+        "issue_coverage": 0.3122,
+        "labels_kept": 0.0342,
+        "precision": 0.716,
+        "precision_ci95": [
+          0.6098,
+          0.8027
+        ],
+        "recall": 0.2417,
+        "threshold": 0.85
+      },
+      {
+        "issue_coverage": 0.1899,
+        "labels_kept": 0.0203,
+        "precision": 0.8125,
+        "precision_ci95": [
+          0.6806,
+          0.8981
+        ],
+        "recall": 0.1625,
+        "threshold": 0.9
+      },
+      {
+        "issue_coverage": 0.0717,
+        "labels_kept": 0.0076,
+        "precision": 0.8889,
+        "precision_ci95": [
+          0.672,
+          0.969
+        ],
+        "recall": 0.0667,
+        "threshold": 0.95
+      }
+    ],
+    "min_precision": 0.7,
+    "n": 237
+  }
+}

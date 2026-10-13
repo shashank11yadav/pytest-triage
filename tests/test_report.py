@@ -33,3 +33,17 @@ def test_markdown_tables_sort_best_first(tmp_path, monkeypatch):
     )
     table = report.markdown_tables()
     assert table.index("| b |") < table.index("| a |")
+
+
+def test_selective_rows_show_dev_choice_on_both_splits():
+    point = {
+        "threshold": 0.9,
+        "precision": 0.8,
+        "precision_ci95": [0.7, 0.9],
+        "recall": 0.2,
+        "issue_coverage": 0.17,
+    }
+    data = {phase: {"chosen_on_dev": {"llm": point}} for phase in ("dev", "test")}
+    rows = report.selective_rows(data)
+    assert [r[0] for r in rows] == ["dev", "test"]
+    assert rows[1][3] == "0.80 (0.70-0.90)" and rows[1][5] == "17%"

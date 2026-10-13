@@ -8,7 +8,7 @@ outputs - the model never writes prose that reaches a maintainer.
 
 import time
 
-from pytest_triage import config, guard, llm
+from pytest_triage import config, guard, llm, policy
 from pytest_triage.classify import assess
 from pytest_triage.config import DEDUPE_MODEL, LABEL_MODEL, LABEL_PROMPT
 from pytest_triage.dedupe import find_duplicates
@@ -73,7 +73,10 @@ def triage_issue(
         },
         "models": {"labels": label_model, "duplicates": dedupe_model, "prompt": prompt},
     }
+    report = policy.apply_policy(report)
     report["reply_draft"] = draft_reply(report)
+    created_at_of = {n: c["created_at"] for n in dupes["candidates"] if (c := index.get(n))}
+    report["warnings"] = policy.check_report(report, issue, created_at_of)
     report["trace"] = {
         "latency_s": round(time.perf_counter() - started, 2),
         **{k: round(v, 2) for k, v in timings.items()},

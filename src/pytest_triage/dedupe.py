@@ -77,11 +77,14 @@ def render(issue: dict, chars: int) -> str:
     return f"<issue number={issue['number']}>\nTitle: {title}\n\n{body}\n</issue>"
 
 
-def expand_queries(issue: dict, model: str = WORKHORSE) -> list[str]:
-    body = json_body(
+def expand_body(issue: dict, model: str = WORKHORSE) -> dict:
+    return json_body(
         EXPAND_SYSTEM, render(issue, ISSUE_CHARS), EXPAND_SCHEMA, model=model, max_output_tokens=200
     )
-    data, _ = generate_json(body)
+
+
+def expand_queries(issue: dict, model: str = WORKHORSE) -> list[str]:
+    data, _ = generate_json(expand_body(issue, model))
     return [q for q in data.get("queries", []) if isinstance(q, str) and q.strip()][:3]
 
 
@@ -112,11 +115,8 @@ def candidates(
     return own + [n for n in rrf(query_rankings) if n not in own][:k]
 
 
-def verify(issue: dict, candidate_issues: list[dict], model: str = WORKHORSE) -> list[dict]:
-    """Model's verdicts: [{"number", "confidence", "reason"}], numbers limited to candidates."""
+def verify_body(issue: dict, candidate_issues: list[dict], model: str = WORKHORSE) -> dict:
     numbers = [c["number"] for c in candidate_issues]
-    if not numbers:
-        return []
     prompt = (
         "New issue:\n"
         + render(issue, ISSUE_CHARS)
@@ -125,15 +125,22 @@ def verify(issue: dict, candidate_issues: list[dict], model: str = WORKHORSE) ->
         + "\n\nWhich candidates, if any, are duplicates of the new issue? "
         "Keep each reason under 25 words."
     )
-    body = json_body(
+    return json_body(
         VERIFY_SYSTEM, prompt, verify_schema(numbers), model=model, max_output_tokens=400
     )
-    data, _ = generate_json(body)
+
+
+def verify(issue: dict, candidate_issues: list[dict], model: str = WORKHORSE) -> list[dict]:
+    """Model's verdicts: [{"number", "confidence", "reason"}], numbers limited to candidates."""
+    numbers = [c["number"] for c in candidate_issues]
+    if not numbers:
+        return []
+    data, _ = generate_json(verify_body(issue, candidate_issues, model))
     verdicts = data.get("duplicates", [])
     if not isinstance(verdicts, list):
         raise BadOutput(f"duplicates is not a list: {verdicts!r}")
     return [
-        v | {"reason": clean_reason(str(v.get("reason", "")))}
+        v | {"reason": clean_reason(str(v.get("reason", "")), VERIFY_SYSTEM)}
         for v in verdicts
         if isinstance(v, dict)
         and v.get("number") in numbers

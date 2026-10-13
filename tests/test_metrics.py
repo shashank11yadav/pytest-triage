@@ -82,3 +82,16 @@ def test_bootstrap_diff_detects_a_clear_gap_and_not_a_tie():
     assert clear["diff"] > 0 and clear["ci95"][0] > 0 and clear["p_not_better"] == 0
     tie = bootstrap_diff(truth, perfect, perfect, rounds=200)
     assert tie["diff"] == 0 and tie["ci95"] == [0.0, 0.0]
+
+
+def test_selective_curve_trades_coverage_for_precision():
+    from pytest_triage.metrics import operating_point, selective_curve
+
+    truth = [{"type: bug"}, {"type: docs"}]
+    suggested = [{"type: bug"}, {"type: bug"}]
+    conf = [{"type: bug": 0.9}, {"type: bug": 0.3}]
+    low, high = selective_curve(truth, suggested, conf, [0.0, 0.5])
+    assert (low["precision"], low["issue_coverage"]) == (0.5, 1.0)
+    assert (high["precision"], high["issue_coverage"], high["labels_kept"]) == (1.0, 0.5, 0.5)
+    assert operating_point([low, high], 0.7)["threshold"] == 0.5
+    assert operating_point([low], 0.7) is None

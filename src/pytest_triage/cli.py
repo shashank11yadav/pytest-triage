@@ -217,6 +217,136 @@ def cmd_eval_learned(args: argparse.Namespace) -> None:
             print(f"{name}: {r['diff']:+.3f}  95% CI [{r['ci95'][0]:+.3f}, {r['ci95'][1]:+.3f}]")
 
 
+def cmd_eval_regress(args: argparse.Namespace) -> None:
+    """Re-run the classifier on dev (cached: free unless a prompt changed) and
+    compare with the committed baseline. Exits 1 on a drop; --update re-baselines."""
+    from pytest_triage import regression
+    from pytest_triage.classify import assess
+    from pytest_triage.llm import BadOutput
+
+    _, dev, memory_index = _label_setup("dev")
+    rows = []
+    for issue in dev:
+        try:
+            assessment = assess(issue, memory_index, config.LABEL_MODEL, prompt=config.LABEL_PROMPT)
+        except BadOutput:
+            assessment = {"labels": set(), "missing": []}
+        rows.append(regression.make_row(issue, assessment))
+
+    old_rows, baseline = regression.load_rows(), regression.load_baseline()
+    current = regression.score(rows)
+    print(f"dev (n={current['n']}): {current}")
+    if baseline:
+        print(f"baseline:          {baseline['metrics']}")
+        print(f"predictions changed on {regression.changed_rows(old_rows, rows)} issues")
+    if args.update:
+        regression.save(rows)
+        print(f"re-baselined -> {regression.BASELINE}")
+        return
+    drops = regression.compare(current, baseline["metrics"]) if baseline else []
+    if drops:
+        raise SystemExit("REGRESSION: " + "; ".join(drops))
+    print("no regression")
+
+
+def _trained(phase: str):
+    """(logreg, vectors by number, scored issues, LLM memory index) with the same
+    protocol as `eval learned`: dev fits < 2023 and tunes on 2023, test fits < 2024
+    and tunes on 2024. Nothing here looks at the test split's labels."""
+    from pytest_triage import learned
+    from pytest_triage.dataset import is_evaluable, split
+    from pytest_triage.search import IssueIndex, load_vectors
+
+    evaluable = [i for i in store.load_issues() if is_evaluable(i)]
+    vectors = dict(zip((i["number"] for i in evaluable), load_vectors(evaluable), strict=True))
+    vec = lambda issues: np.array([vectors[i["number"]] for i in issues])  # noqa: E731
+    memory, test = split(evaluable)
+    train_, dev = split(memory, date=config.DEV_DATE)
+    if phase == "dev":
+        fit, tune = split(train_, date="2023-01-01")
+        scored, llm_memory = dev, train_
+    else:
+        fit, tune, scored, llm_memory = train_, dev, test, memory
+    model = learned.train(fit, vec(fit), tune, vec(tune))
+    return model, vectors, scored, IssueIndex.build(llm_memory)
+
+
+def cmd_eval_slices(args: argparse.Namespace) -> None:
+    """Scores by issue shape on the test split, from cached predictions (free).
+    Descriptive only: no choice is made from these numbers."""
+    from pytest_triage import baselines, learned
+    from pytest_triage.classify import make_llm_classifier
+    from pytest_triage.evaluate import _now, save_result
+    from pytest_triage.slices import slice_report
+
+    model, vectors, scored, memory_index = _trained("test")
+    predictors = {
+        f"llm {config.LABEL_PROMPT}": make_llm_classifier(
+            memory_index, config.LABEL_MODEL, config.LABEL_PROMPT
+        ),
+        "logreg": learned.as_predictor(model, vectors),
+        "knn": baselines.make_knn(memory_index),
+    }
+    preds = {k: [f(i) for i in scored] for k, f in predictors.items()}
+    report = slice_report(scored, preds)
+    save_result("slices", "test", report | {"at": _now()})
+    print(f"{'slice':<34}{'n':>5}" + "".join(f"{k:>22}" for k in predictors))
+    for name, row in report.items():
+        cells = "".join(
+            f"{row[k]['micro_f1']:>8.2f} [{row[k]['ci95'][0]:.2f}-{row[k]['ci95'][1]:.2f}]"
+            for k in predictors
+        )
+        print(f"{name:<34}{row['n']:>5}{cells}")
+
+
+def cmd_eval_selective(args: argparse.Namespace) -> None:
+    """Precision vs. coverage, with the trained classifier's probability as the
+    confidence for each LLM label. The threshold is chosen on dev (the lowest one
+    reaching REPLY_MIN_PRECISION) and then reported once on test."""
+    from pytest_triage import learned
+    from pytest_triage.classify import make_llm_classifier
+    from pytest_triage.dataset import targets
+    from pytest_triage.evaluate import _now, save_result
+    from pytest_triage.metrics import operating_point, selective_curve
+
+    grid = [round(x, 2) for x in np.arange(0.0, 0.951, 0.05)]
+    bar = config.REPLY_MIN_PRECISION
+    chosen = {}
+    for phase in ("dev", "test"):
+        model, vectors, scored, memory_index = _trained(phase)
+        llm = make_llm_classifier(memory_index, config.LABEL_MODEL, config.LABEL_PROMPT)
+        probs = learned.proba_lookup(model, vectors)
+        truth = [targets(i) for i in scored]
+        conf = [probs(i) for i in scored]
+        llm_labels = [llm(i) for i in scored]
+        logreg_labels = [set(config.LABELS)] * len(scored)  # logreg alone: every label, by p
+        result = {
+            "n": len(scored),
+            "llm gated by logreg p": selective_curve(truth, llm_labels, conf, grid),
+            "logreg p alone": selective_curve(truth, logreg_labels, conf, grid),
+        }
+        if phase == "dev":
+            for name in ("llm gated by logreg p", "logreg p alone"):
+                point = operating_point(result[name], bar)
+                chosen[name] = point["threshold"] if point else None
+        result["chosen_on_dev"] = {
+            name: next((c for c in result[name] if c["threshold"] == t), None)
+            for name, t in chosen.items()
+        }
+        result["min_precision"] = bar
+        save_result("selective", phase, result | {"at": _now()})
+        print(f"\n== {phase} (n={len(scored)}); thresholds chosen on dev for precision >= {bar}")
+        for name, point in result["chosen_on_dev"].items():
+            if point is None:
+                print(f"  {name:<24} never reaches {bar} on dev")
+                continue
+            print(
+                f"  {name:<24} t={point['threshold']:.2f}  precision {point['precision']:.2f} "
+                f"[{point['precision_ci95'][0]:.2f}-{point['precision_ci95'][1]:.2f}]  "
+                f"recall {point['recall']:.2f}  issues covered {point['issue_coverage']:.0%}"
+            )
+
+
 def cmd_eval_rerank(args: argparse.Namespace) -> None:
     from pytest_triage.evaluate import eval_rerank
     from pytest_triage.search import IssueIndex
@@ -258,19 +388,26 @@ def _live_indexes():
 
 
 def cmd_eval_attacks(args: argparse.Namespace) -> None:
-    from pytest_triage.attacks import run_attacks
+    from pytest_triage.attacks import MUTATIONS, run_attacks
     from pytest_triage.evaluate import _now, save_result
 
     issues, index, labelled = _live_indexes()
-    result = run_attacks(issues, index, labelled, args.model, prompt=args.prompt)
+    mutations = tuple(MUTATIONS) if args.mutations else ("verbatim",)
+    result = run_attacks(
+        issues, index, labelled, args.model, prompt=args.prompt, mutations=mutations
+    )
     key = args.model or (
         "pipeline" if args.prompt == config.LABEL_PROMPT else f"prompt {args.prompt}"
     )
+    key += " + mutations" if args.mutations else ""
     save_result("attacks", key, result | {"at": _now()})
     print(
         f"\n{result['landed']}/{result['n']} attacks landed; "
         f"{result['not_reached']} never reached the model (invalid test)"
     )
+    for name, r in result["rates"].items():
+        lo, hi = r["ci95"]
+        print(f"  {name:<13} {r['count']}/{r['n']}  (95% CI {lo:.0%}-{hi:.0%})")
 
 
 def cmd_issue(args: argparse.Namespace) -> None:
@@ -439,6 +576,15 @@ def build_parser() -> argparse.ArgumentParser:
         default=["Xenova/ms-marco-MiniLM-L-12-v2", "BAAI/bge-reranker-v2-m3-int8"],
     )
     p.set_defaults(func=cmd_eval_rerank)
+    p = ev.add_parser("regress", help="dev re-run vs. the committed baseline (exit 1 on a drop)")
+    p.add_argument("--update", action="store_true", help="write a new baseline")
+    p.set_defaults(func=cmd_eval_regress)
+    ev.add_parser("slices", help="scores by issue shape on test (free, cached)").set_defaults(
+        func=cmd_eval_slices
+    )
+    ev.add_parser(
+        "selective", help="precision vs. coverage with a confidence threshold (free, cached)"
+    ).set_defaults(func=cmd_eval_selective)
     p = ev.add_parser("learned", help="trained classifier + LLM ensembles (free, cached)")
     p.add_argument("--phase", choices=["dev", "test"], default="dev")
     p.add_argument("--variants", nargs="*", default=[], help="ensembles to run on test")
@@ -449,6 +595,9 @@ def build_parser() -> argparse.ArgumentParser:
     p = ev.add_parser("attacks", help="prompt-injection suite against the real model")
     p.add_argument("--model", default=None, help="override config's chosen models")
     p.add_argument("--prompt", default=config.LABEL_PROMPT, choices=["v1", "v2", "v3", "v3s"])
+    p.add_argument(
+        "--mutations", action="store_true", help="also run 5 automatic variants of each attack"
+    )
     p.set_defaults(func=cmd_eval_attacks)
 
     p = sub.add_parser("shadow", help="triage new issues and record predictions")

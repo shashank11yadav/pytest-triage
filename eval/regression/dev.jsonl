@@ -1,0 +1,256 @@
+{"number": 11758, "truth": ["topic: reporting", "type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: bug"], "missing": []}
+{"number": 11759, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: bug"], "missing": []}
+{"number": 11761, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 11765, "truth": ["topic: collection"], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: bug"], "missing": ["full error output or traceback"]}
+{"number": 11771, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 11772, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": ["minimal reproducible example"]}
+{"number": 11773, "truth": ["topic: parametrize"], "needs_info": false, "flagged": false, "labels": ["topic: parametrize", "type: bug"], "missing": []}
+{"number": 11777, "truth": ["topic: reporting", "type: question"], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: enhancement"], "missing": []}
+{"number": 11781, "truth": ["topic: collection"], "needs_info": false, "flagged": false, "labels": ["topic: config", "type: bug"], "missing": ["minimal reproducible example", "pytest and Python versions"]}
+{"number": 11783, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 11790, "truth": ["type: docs"], "needs_info": false, "flagged": false, "labels": ["type: docs"], "missing": []}
+{"number": 11797, "truth": [], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: bug"], "missing": []}
+{"number": 11805, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 11806, "truth": [], "needs_info": true, "flagged": false, "labels": ["topic: parametrize", "type: proposal"], "missing": []}
+{"number": 11847, "truth": [], "needs_info": true, "flagged": false, "labels": ["type: question"], "missing": []}
+{"number": 11850, "truth": ["type: enhancement"], "needs_info": false, "flagged": false, "labels": ["type: enhancement"], "missing": []}
+{"number": 11860, "truth": [], "needs_info": true, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 11871, "truth": ["type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: proposal"], "missing": []}
+{"number": 11873, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": ["minimal reproducible example", "full error output or traceback", "pytest and Python versions", "expected vs. actual behaviour"]}
+{"number": 11880, "truth": ["type: question"], "needs_info": false, "flagged": false, "labels": ["type: question"], "missing": []}
+{"number": 11884, "truth": ["topic: fixtures"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: bug"], "missing": ["minimal reproducible example"]}
+{"number": 11886, "truth": [], "needs_info": true, "flagged": false, "labels": ["type: bug"], "missing": ["minimal reproducible example"]}
+{"number": 11890, "truth": [], "needs_info": true, "flagged": false, "labels": [], "missing": []}
+{"number": 11895, "truth": ["topic: collection"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: bug"], "missing": ["minimal reproducible example", "expected vs. actual behaviour"]}
+{"number": 11904, "truth": ["topic: collection", "type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: bug"], "missing": []}
+{"number": 11907, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 11908, "truth": [], "needs_info": true, "flagged": false, "labels": ["type: bug"], "missing": ["minimal reproducible example", "pytest and Python versions", "expected vs. actual behaviour"]}
+{"number": 11919, "truth": [], "needs_info": true, "flagged": false, "labels": ["type: question"], "missing": ["pytest and Python versions", "full error output or traceback"]}
+{"number": 11929, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: bug"], "missing": []}
+{"number": 11933, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 11937, "truth": ["topic: collection", "type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: parametrize", "type: bug"], "missing": []}
+{"number": 11940, "truth": ["type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: config", "type: proposal"], "missing": []}
+{"number": 11942, "truth": ["type: enhancement"], "needs_info": false, "flagged": false, "labels": ["type: enhancement"], "missing": []}
+{"number": 11944, "truth": ["topic: fixtures", "type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: enhancement"], "missing": []}
+{"number": 11945, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 11953, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": ["minimal reproducible example", "full error output or traceback", "expected vs. actual behaviour"]}
+{"number": 11975, "truth": ["type: proposal"], "needs_info": false, "flagged": false, "labels": ["type: proposal"], "missing": []}
+{"number": 11978, "truth": ["type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: config", "type: enhancement"], "missing": []}
+{"number": 11980, "truth": ["topic: reporting", "type: enhancement"], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: bug"], "missing": []}
+{"number": 11983, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": ["minimal reproducible example", "pytest and Python versions"]}
+{"number": 11984, "truth": ["type: proposal"], "needs_info": false, "flagged": false, "labels": ["type: enhancement"], "missing": []}
+{"number": 11987, "truth": [], "needs_info": true, "flagged": false, "labels": ["topic: fixtures", "type: bug"], "missing": []}
+{"number": 11988, "truth": ["type: docs"], "needs_info": false, "flagged": false, "labels": ["type: docs"], "missing": []}
+{"number": 11994, "truth": [], "needs_info": true, "flagged": false, "labels": ["type: question"], "missing": ["minimal reproducible example", "pytest and Python versions"]}
+{"number": 12008, "truth": ["topic: fixtures", "topic: parametrize", "type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "topic: parametrize", "type: bug"], "missing": []}
+{"number": 12009, "truth": [], "needs_info": true, "flagged": false, "labels": ["topic: reporting", "type: bug"], "missing": []}
+{"number": 12011, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12016, "truth": ["topic: collection", "type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: enhancement"], "missing": []}
+{"number": 12021, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12028, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["type: enhancement"], "missing": []}
+{"number": 12044, "truth": [], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: bug"], "missing": ["minimal reproducible example", "pytest and Python versions"]}
+{"number": 12045, "truth": [], "needs_info": true, "flagged": false, "labels": ["type: question"], "missing": []}
+{"number": 12047, "truth": ["topic: fixtures", "topic: reporting"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: enhancement"], "missing": []}
+{"number": 12062, "truth": ["type: docs"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12064, "truth": [], "needs_info": true, "flagged": false, "labels": ["topic: collection", "type: bug"], "missing": []}
+{"number": 12065, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12068, "truth": ["topic: config"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12080, "truth": [], "needs_info": true, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12081, "truth": ["type: enhancement"], "needs_info": false, "flagged": false, "labels": ["type: enhancement"], "missing": []}
+{"number": 12083, "truth": ["topic: collection"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: bug"], "missing": []}
+{"number": 12084, "truth": ["type: proposal"], "needs_info": false, "flagged": false, "labels": ["type: enhancement"], "missing": []}
+{"number": 12086, "truth": ["topic: fixtures", "type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "topic: parametrize", "type: question"], "missing": []}
+{"number": 12091, "truth": ["topic: fixtures", "topic: parametrize", "type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "topic: parametrize", "type: bug"], "missing": []}
+{"number": 12099, "truth": ["type: question"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12107, "truth": [], "needs_info": true, "flagged": false, "labels": ["type: docs"], "missing": []}
+{"number": 12111, "truth": ["type: bug"], "needs_info": true, "flagged": false, "labels": ["topic: config", "topic: reporting", "type: enhancement"], "missing": []}
+{"number": 12112, "truth": ["topic: collection"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: bug"], "missing": []}
+{"number": 12114, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12117, "truth": [], "needs_info": true, "flagged": false, "labels": ["topic: reporting", "type: bug"], "missing": []}
+{"number": 12120, "truth": ["topic: collection"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: bug"], "missing": []}
+{"number": 12123, "truth": ["topic: collection"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: bug"], "missing": []}
+{"number": 12134, "truth": ["topic: fixtures"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: bug"], "missing": []}
+{"number": 12135, "truth": ["topic: fixtures", "type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: bug"], "missing": []}
+{"number": 12139, "truth": ["type: question"], "needs_info": true, "flagged": false, "labels": [], "missing": ["minimal reproducible example", "full error output or traceback", "pytest and Python versions", "expected vs. actual behaviour"]}
+{"number": 12143, "truth": ["topic: reporting", "type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: enhancement"], "missing": []}
+{"number": 12144, "truth": [], "needs_info": true, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12145, "truth": ["type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: proposal"], "missing": []}
+{"number": 12146, "truth": ["topic: fixtures", "type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "topic: parametrize", "type: bug"], "missing": ["minimal reproducible example", "expected vs. actual behaviour"]}
+{"number": 12151, "truth": ["topic: reporting"], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: enhancement"], "missing": []}
+{"number": 12163, "truth": ["topic: fixtures", "type: proposal"], "needs_info": true, "flagged": false, "labels": ["topic: fixtures", "type: proposal"], "missing": []}
+{"number": 12166, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: proposal"], "missing": []}
+{"number": 12175, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12178, "truth": ["topic: collection"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: bug"], "missing": []}
+{"number": 12186, "truth": ["topic: config"], "needs_info": false, "flagged": false, "labels": ["topic: config", "type: bug"], "missing": []}
+{"number": 12189, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12194, "truth": ["topic: collection"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: bug"], "missing": []}
+{"number": 12198, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12201, "truth": ["type: question"], "needs_info": false, "flagged": false, "labels": ["topic: parametrize", "type: proposal"], "missing": []}
+{"number": 12202, "truth": ["type: docs"], "needs_info": true, "flagged": false, "labels": ["type: docs"], "missing": []}
+{"number": 12203, "truth": ["topic: fixtures"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: bug"], "missing": ["minimal reproducible example"]}
+{"number": 12216, "truth": ["topic: fixtures", "topic: parametrize"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "topic: parametrize", "type: bug"], "missing": []}
+{"number": 12223, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: enhancement"], "missing": []}
+{"number": 12226, "truth": [], "needs_info": true, "flagged": false, "labels": ["topic: config", "type: proposal"], "missing": []}
+{"number": 12228, "truth": ["topic: config", "type: docs"], "needs_info": false, "flagged": false, "labels": ["topic: config", "type: docs"], "missing": []}
+{"number": 12235, "truth": ["type: docs"], "needs_info": false, "flagged": false, "labels": ["type: proposal"], "missing": []}
+{"number": 12239, "truth": ["type: question"], "needs_info": false, "flagged": false, "labels": ["type: proposal"], "missing": []}
+{"number": 12242, "truth": [], "needs_info": true, "flagged": false, "labels": ["topic: config", "type: question"], "missing": []}
+{"number": 12249, "truth": ["type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: config", "type: enhancement"], "missing": []}
+{"number": 12254, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12255, "truth": ["type: enhancement"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "topic: reporting", "type: enhancement"], "missing": []}
+{"number": 12263, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": ["minimal reproducible example", "pytest and Python versions"]}
+{"number": 12266, "truth": [], "needs_info": true, "flagged": false, "labels": ["type: bug"], "missing": ["minimal reproducible example", "full error output or traceback"]}
+{"number": 12273, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": ["minimal reproducible example", "expected vs. actual behaviour"]}
+{"number": 12275, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: bug"], "missing": []}
+{"number": 12276, "truth": ["topic: collection"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: bug"], "missing": ["minimal reproducible example", "full error output or traceback"]}
+{"number": 12278, "truth": [], "needs_info": true, "flagged": false, "labels": ["type: bug"], "missing": ["minimal reproducible example", "pytest and Python versions"]}
+{"number": 12281, "truth": ["type: proposal"], "needs_info": false, "flagged": false, "labels": ["type: enhancement"], "missing": []}
+{"number": 12290, "truth": ["type: docs"], "needs_info": false, "flagged": false, "labels": ["type: docs"], "missing": []}
+{"number": 12291, "truth": ["topic: collection", "type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "topic: config", "type: bug"], "missing": []}
+{"number": 12303, "truth": ["topic: collection", "type: bug"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12305, "truth": [], "needs_info": true, "flagged": false, "labels": ["topic: collection", "type: bug"], "missing": []}
+{"number": 12306, "truth": ["topic: fixtures"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: bug"], "missing": []}
+{"number": 12307, "truth": ["topic: reporting", "type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: enhancement"], "missing": []}
+{"number": 12308, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12312, "truth": ["topic: collection", "topic: reporting"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: enhancement"], "missing": []}
+{"number": 12328, "truth": ["topic: collection", "topic: fixtures", "type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: bug"], "missing": []}
+{"number": 12332, "truth": [], "needs_info": true, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12349, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12350, "truth": ["type: proposal"], "needs_info": false, "flagged": false, "labels": ["type: enhancement"], "missing": []}
+{"number": 12355, "truth": ["topic: fixtures", "topic: parametrize"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "topic: fixtures", "topic: parametrize", "type: bug"], "missing": ["minimal reproducible example"]}
+{"number": 12365, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12367, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12371, "truth": ["topic: collection"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: bug"], "missing": []}
+{"number": 12376, "truth": ["topic: fixtures", "type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: proposal"], "missing": []}
+{"number": 12377, "truth": ["type: docs"], "needs_info": false, "flagged": false, "labels": ["type: docs"], "missing": []}
+{"number": 12381, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12384, "truth": [], "needs_info": true, "flagged": false, "labels": ["topic: config", "type: bug"], "missing": []}
+{"number": 12387, "truth": ["type: proposal"], "needs_info": false, "flagged": false, "labels": ["type: proposal"], "missing": []}
+{"number": 12398, "truth": [], "needs_info": true, "flagged": false, "labels": ["topic: reporting", "type: question"], "missing": ["minimal reproducible example", "expected vs. actual behaviour"]}
+{"number": 12406, "truth": [], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: enhancement"], "missing": []}
+{"number": 12407, "truth": ["topic: reporting", "type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: proposal"], "missing": []}
+{"number": 12411, "truth": ["topic: parametrize"], "needs_info": false, "flagged": false, "labels": ["topic: parametrize", "type: proposal"], "missing": []}
+{"number": 12417, "truth": [], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: bug"], "missing": []}
+{"number": 12424, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12425, "truth": [], "needs_info": true, "flagged": false, "labels": ["topic: collection", "type: bug"], "missing": []}
+{"number": 12426, "truth": ["topic: fixtures"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: enhancement"], "missing": []}
+{"number": 12437, "truth": ["type: bug", "type: docs"], "needs_info": false, "flagged": false, "labels": ["type: docs"], "missing": []}
+{"number": 12444, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: bug"], "missing": []}
+{"number": 12446, "truth": [], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: bug"], "missing": []}
+{"number": 12448, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12459, "truth": ["topic: fixtures"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "topic: parametrize", "type: bug"], "missing": []}
+{"number": 12465, "truth": [], "needs_info": false, "flagged": false, "labels": [], "missing": []}
+{"number": 12474, "truth": ["type: docs"], "needs_info": false, "flagged": false, "labels": ["type: docs"], "missing": []}
+{"number": 12490, "truth": ["topic: collection"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12497, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": ["full error output or traceback"]}
+{"number": 12499, "truth": ["topic: reporting", "type: enhancement"], "needs_info": false, "flagged": false, "labels": ["type: proposal"], "missing": []}
+{"number": 12504, "truth": ["topic: parametrize", "type: enhancement"], "needs_info": false, "flagged": false, "labels": ["topic: parametrize", "type: proposal"], "missing": []}
+{"number": 12505, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: enhancement"], "missing": []}
+{"number": 12538, "truth": ["type: docs"], "needs_info": false, "flagged": false, "labels": ["type: docs"], "missing": []}
+{"number": 12544, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: enhancement"], "missing": []}
+{"number": 12546, "truth": ["topic: collection"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12549, "truth": [], "needs_info": true, "flagged": false, "labels": [], "missing": ["minimal reproducible example", "expected vs. actual behaviour"]}
+{"number": 12550, "truth": ["topic: collection"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: bug"], "missing": ["minimal reproducible example", "pytest and Python versions"]}
+{"number": 12552, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12554, "truth": [], "needs_info": false, "flagged": false, "labels": [], "missing": []}
+{"number": 12573, "truth": ["type: docs"], "needs_info": false, "flagged": false, "labels": ["type: docs"], "missing": []}
+{"number": 12576, "truth": ["type: docs"], "needs_info": false, "flagged": false, "labels": ["type: docs"], "missing": []}
+{"number": 12577, "truth": ["type: docs"], "needs_info": false, "flagged": false, "labels": ["type: docs"], "missing": []}
+{"number": 12580, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": ["minimal reproducible example", "full error output or traceback", "pytest and Python versions"]}
+{"number": 12582, "truth": ["type: enhancement"], "needs_info": false, "flagged": false, "labels": ["type: enhancement"], "missing": []}
+{"number": 12592, "truth": ["topic: collection"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: bug"], "missing": []}
+{"number": 12594, "truth": ["topic: collection"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12596, "truth": ["topic: fixtures", "type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: proposal"], "missing": []}
+{"number": 12599, "truth": ["topic: reporting"], "needs_info": true, "flagged": false, "labels": ["type: bug"], "missing": ["minimal reproducible example", "full error output or traceback"]}
+{"number": 12604, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: proposal"], "missing": []}
+{"number": 12605, "truth": ["topic: collection"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "topic: config", "type: bug"], "missing": []}
+{"number": 12610, "truth": ["type: proposal"], "needs_info": false, "flagged": false, "labels": ["type: enhancement"], "missing": []}
+{"number": 12612, "truth": ["topic: config", "topic: reporting"], "needs_info": false, "flagged": false, "labels": ["topic: parametrize", "type: question"], "missing": []}
+{"number": 12615, "truth": ["topic: config", "topic: reporting"], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: enhancement"], "missing": []}
+{"number": 12617, "truth": [], "needs_info": true, "flagged": false, "labels": [], "missing": ["minimal reproducible example", "full error output or traceback"]}
+{"number": 12619, "truth": ["type: proposal"], "needs_info": false, "flagged": false, "labels": ["type: proposal"], "missing": []}
+{"number": 12624, "truth": ["topic: config", "topic: reporting"], "needs_info": false, "flagged": false, "labels": ["topic: config", "type: enhancement"], "missing": []}
+{"number": 12625, "truth": ["topic: collection", "type: enhancement"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "topic: config", "type: enhancement"], "missing": []}
+{"number": 12630, "truth": ["topic: fixtures", "type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: proposal"], "missing": []}
+{"number": 12631, "truth": [], "needs_info": true, "flagged": false, "labels": ["type: bug"], "missing": ["minimal reproducible example", "expected vs. actual behaviour"]}
+{"number": 12646, "truth": ["topic: collection", "type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: proposal"], "missing": []}
+{"number": 12647, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12649, "truth": ["type: question"], "needs_info": false, "flagged": false, "labels": ["type: question"], "missing": []}
+{"number": 12650, "truth": [], "needs_info": true, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12658, "truth": ["type: docs"], "needs_info": false, "flagged": false, "labels": ["type: docs"], "missing": []}
+{"number": 12667, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12671, "truth": [], "needs_info": true, "flagged": false, "labels": ["topic: config", "type: bug"], "missing": []}
+{"number": 12673, "truth": ["topic: fixtures", "type: question"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: proposal"], "missing": []}
+{"number": 12685, "truth": ["topic: parametrize"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "topic: parametrize", "type: bug"], "missing": []}
+{"number": 12688, "truth": ["topic: collection", "type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: enhancement"], "missing": []}
+{"number": 12689, "truth": [], "needs_info": false, "flagged": false, "labels": [], "missing": []}
+{"number": 12693, "truth": ["type: enhancement"], "needs_info": false, "flagged": false, "labels": ["type: proposal"], "missing": []}
+{"number": 12697, "truth": ["type: enhancement"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: bug"], "missing": []}
+{"number": 12707, "truth": ["type: enhancement"], "needs_info": false, "flagged": false, "labels": ["type: enhancement"], "missing": []}
+{"number": 12713, "truth": ["topic: reporting", "type: enhancement"], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: enhancement"], "missing": []}
+{"number": 12715, "truth": ["topic: collection"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12726, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": ["full error output or traceback"]}
+{"number": 12728, "truth": [], "needs_info": true, "flagged": false, "labels": [], "missing": ["minimal reproducible example", "full error output or traceback", "pytest and Python versions", "expected vs. actual behaviour"]}
+{"number": 12731, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12736, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: enhancement"], "missing": []}
+{"number": 12745, "truth": ["topic: reporting", "type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: parametrize", "type: bug"], "missing": []}
+{"number": 12754, "truth": [], "needs_info": true, "flagged": false, "labels": ["type: bug"], "missing": ["minimal reproducible example", "full error output or traceback", "pytest and Python versions", "expected vs. actual behaviour"]}
+{"number": 12763, "truth": ["type: proposal"], "needs_info": false, "flagged": false, "labels": ["type: proposal"], "missing": []}
+{"number": 12775, "truth": ["topic: config"], "needs_info": false, "flagged": false, "labels": ["topic: config", "type: enhancement"], "missing": []}
+{"number": 12800, "truth": ["topic: reporting", "type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: enhancement"], "missing": []}
+{"number": 12802, "truth": [], "needs_info": true, "flagged": false, "labels": ["topic: config", "type: bug"], "missing": []}
+{"number": 12807, "truth": ["topic: collection", "type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: bug"], "missing": []}
+{"number": 12808, "truth": [], "needs_info": true, "flagged": false, "labels": [], "missing": ["minimal reproducible example", "full error output or traceback", "pytest and Python versions", "expected vs. actual behaviour"]}
+{"number": 12814, "truth": ["topic: fixtures", "type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: proposal"], "missing": []}
+{"number": 12824, "truth": ["topic: config", "type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: config", "type: bug"], "missing": []}
+{"number": 12825, "truth": [], "needs_info": true, "flagged": false, "labels": ["type: question"], "missing": ["minimal reproducible example", "full error output or traceback", "pytest and Python versions", "expected vs. actual behaviour"]}
+{"number": 12842, "truth": ["type: docs"], "needs_info": false, "flagged": false, "labels": ["type: docs"], "missing": []}
+{"number": 12844, "truth": [], "needs_info": true, "flagged": false, "labels": [], "missing": ["minimal reproducible example", "pytest and Python versions", "expected vs. actual behaviour"]}
+{"number": 12849, "truth": ["topic: reporting", "type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: bug"], "missing": []}
+{"number": 12852, "truth": ["topic: fixtures", "type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: enhancement"], "missing": []}
+{"number": 12857, "truth": ["type: docs"], "needs_info": false, "flagged": false, "labels": ["topic: config", "type: docs"], "missing": []}
+{"number": 12860, "truth": ["type: enhancement"], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: enhancement"], "missing": []}
+{"number": 12863, "truth": ["topic: collection", "topic: parametrize", "type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: parametrize", "type: bug"], "missing": []}
+{"number": 12865, "truth": [], "needs_info": true, "flagged": false, "labels": ["type: bug"], "missing": ["minimal reproducible example", "full error output or traceback", "expected vs. actual behaviour"]}
+{"number": 12874, "truth": [], "needs_info": false, "flagged": false, "labels": [], "missing": []}
+{"number": 12876, "truth": ["type: docs"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12882, "truth": ["topic: fixtures", "topic: reporting"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: bug"], "missing": []}
+{"number": 12883, "truth": ["type: docs"], "needs_info": false, "flagged": false, "labels": ["type: docs"], "missing": []}
+{"number": 12884, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: enhancement"], "missing": []}
+{"number": 12888, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12895, "truth": [], "needs_info": true, "flagged": false, "labels": ["type: bug"], "missing": ["minimal reproducible example", "full error output or traceback", "expected vs. actual behaviour"]}
+{"number": 12899, "truth": ["type: docs", "type: question"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "topic: parametrize", "type: proposal"], "missing": []}
+{"number": 12907, "truth": ["topic: reporting", "type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "topic: reporting", "type: enhancement"], "missing": []}
+{"number": 12915, "truth": ["topic: config", "type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: config", "type: proposal"], "missing": []}
+{"number": 12916, "truth": [], "needs_info": true, "flagged": false, "labels": ["type: question"], "missing": []}
+{"number": 12923, "truth": ["topic: fixtures", "type: question"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: docs"], "missing": []}
+{"number": 12929, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12931, "truth": ["topic: fixtures"], "needs_info": true, "flagged": false, "labels": ["topic: parametrize", "type: question"], "missing": ["minimal reproducible example", "pytest and Python versions"]}
+{"number": 12938, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: enhancement"], "missing": []}
+{"number": 12939, "truth": ["topic: fixtures", "type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: proposal"], "missing": []}
+{"number": 12943, "truth": ["topic: reporting", "type: enhancement"], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: enhancement"], "missing": []}
+{"number": 12946, "truth": ["type: docs"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 12952, "truth": ["topic: fixtures", "type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: bug"], "missing": []}
+{"number": 12960, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: enhancement"], "missing": []}
+{"number": 12966, "truth": ["type: docs"], "needs_info": false, "flagged": false, "labels": ["type: docs"], "missing": []}
+{"number": 12973, "truth": ["topic: reporting", "type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: proposal"], "missing": []}
+{"number": 12979, "truth": ["type: docs"], "needs_info": false, "flagged": false, "labels": ["type: docs"], "missing": []}
+{"number": 12984, "truth": ["topic: collection", "type: question"], "needs_info": true, "flagged": false, "labels": ["topic: collection", "type: question"], "missing": []}
+{"number": 12989, "truth": ["topic: fixtures"], "needs_info": false, "flagged": false, "labels": ["topic: fixtures", "type: proposal"], "missing": []}
+{"number": 13001, "truth": ["type: proposal"], "needs_info": false, "flagged": false, "labels": ["type: proposal"], "missing": []}
+{"number": 13003, "truth": ["type: proposal"], "needs_info": false, "flagged": false, "labels": ["type: enhancement"], "missing": []}
+{"number": 13010, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 13021, "truth": [], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": ["minimal reproducible example"]}
+{"number": 13023, "truth": [], "needs_info": true, "flagged": false, "labels": ["topic: reporting", "type: enhancement"], "missing": []}
+{"number": 13030, "truth": [], "needs_info": false, "flagged": false, "labels": ["topic: config", "type: enhancement"], "missing": []}
+{"number": 13038, "truth": ["topic: collection", "topic: fixtures", "type: docs"], "needs_info": false, "flagged": false, "labels": ["type: enhancement"], "missing": []}
+{"number": 13045, "truth": ["type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: proposal"], "missing": []}
+{"number": 13047, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 13050, "truth": ["topic: collection"], "needs_info": false, "flagged": false, "labels": ["type: bug"], "missing": ["minimal reproducible example", "pytest and Python versions"]}
+{"number": 13055, "truth": ["topic: parametrize", "type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: parametrize", "type: proposal"], "missing": []}
+{"number": 13059, "truth": ["type: proposal"], "needs_info": false, "flagged": false, "labels": ["type: proposal"], "missing": []}
+{"number": 13072, "truth": ["topic: reporting", "type: proposal"], "needs_info": false, "flagged": false, "labels": ["topic: reporting", "type: enhancement"], "missing": []}
+{"number": 13079, "truth": ["type: question"], "needs_info": true, "flagged": false, "labels": ["type: bug"], "missing": []}
+{"number": 13081, "truth": ["type: docs"], "needs_info": false, "flagged": false, "labels": ["type: docs", "type: enhancement"], "missing": []}
+{"number": 13083, "truth": ["type: bug"], "needs_info": false, "flagged": false, "labels": ["topic: collection", "type: bug"], "missing": []}
+{"number": 13092, "truth": [], "needs_info": false, "flagged": false, "labels": [], "missing": []}

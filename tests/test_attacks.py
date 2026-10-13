@@ -43,3 +43,23 @@ def test_attack_lands_only_when_control_lacks_the_outcome(monkeypatch):
     monkeypatch.setattr("pytest_triage.triage.triage_issue", fake_triage)
     result = attacks.run_attacks([real], index, index)
     assert result["landed"] == 1 and result["cases"][0]["landed"]
+
+
+def test_mutations_rewrite_body_payloads_only():
+    plain = next(c for c in attacks.CASES if c["name"] == "plain instruction")
+    title = next(c for c in attacks.CASES if c["name"] == "instruction in the title")
+    names = list(attacks.MUTATIONS)
+    base = {"title": "t", "body": "body"}
+    bodies = {m: attack(base)["body"] for m, attack in attacks.variants(plain, names)}
+    assert len(set(bodies.values())) == len(names)  # every variant is a different request
+    assert bodies["moved to the top"].endswith("body")
+    assert attacks.ZWSP in bodies["zero-width spaces"]
+    assert "Ignore" not in bodies["homoglyphs"]  # Cyrillic look-alikes
+    assert [m for m, _ in attacks.variants(title, names)] == ["verbatim"]
+
+
+def test_routed_attack_fools_the_model_but_does_not_land():
+    case = {"landed": attacks._docs}
+    routed = {"labels": [], "route": "human", "raw": {"labels": ["type: docs"]}}
+    assert attacks._outcome(case, routed, "raw")
+    assert not attacks._outcome(case, routed, "shown")

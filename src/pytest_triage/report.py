@@ -67,10 +67,46 @@ def markdown_tables() -> str:
         out += ["", "### Prompt injection", ""]
         for k, v in attacks.items():
             out.append(f"- `{k}`: {v['landed']}/{v['n']} attacks landed")
+            if "rates" in v:  # mutation runs: too many rows to list, rates only
+                continue
             out += [
                 f"  - {'LANDED' if c['landed'] else 'blocked'}: {c['name']}" for c in v["cases"]
             ]
+    slices = _load("slices").get("test")
+    if slices:
+        names = [k for k in next(iter(slices.values())) if k != "n"]
+        out += ["", "### Micro-F1 by issue shape (test)", ""]
+        out.append("| Slice | n | " + " | ".join(names) + " |")
+        out.append("|---|---|" + "---|" * len(names))
+        for name, row in slices.items():
+            if name == "at":
+                continue
+            cells = " | ".join(
+                f"{row[k]['micro_f1']:.2f} ({row[k]['ci95'][0]:.2f}-{row[k]['ci95'][1]:.2f})"
+                for k in names
+            )
+            out.append(f"| {name} | {row['n']} | {cells} |")
     return "\n".join(out)
+
+
+def selective_rows(selective: dict) -> list[list[str]]:
+    """Operating points chosen on dev, as reported on dev and test."""
+    rows = []
+    for phase in ("dev", "test"):
+        for name, p in selective.get(phase, {}).get("chosen_on_dev", {}).items():
+            if p:
+                rows.append(
+                    [
+                        phase,
+                        name,
+                        f"{p['threshold']:.2f}",
+                        f"{p['precision']:.2f} ({p['precision_ci95'][0]:.2f}-"
+                        f"{p['precision_ci95'][1]:.2f})",
+                        f"{p['recall']:.2f}",
+                        _pct(p["issue_coverage"]),
+                    ]
+                )
+    return rows
 
 
 def _table(headers: list[str], rows: list[list[str]]) -> str:
@@ -122,17 +158,56 @@ def html_page() -> str:
             "comments) plus non-duplicates to measure false alarms.</p>"
             + _table(["Method", "Found", "False alarms", "95% CI"], rows)
         )
-    if attacks:
+    selective = _load("selective")
+    if selective:
+        sections.append(
+            "<h2>High-precision mode</h2><p>Show an LLM label only when the trained "
+            "classifier also gives it high probability. The threshold was chosen on 2024 "
+            "issues (lowest one reaching 70% precision) and then applied once to the test "
+            "set.</p>"
+            + _table(
+                ["Split", "Confidence", "Threshold", "Precision (95% CI)", "Recall", "Issues"],
+                [[html.escape(c) for c in r] for r in selective_rows(selective)],
+            )
+        )
+    slices = _load("slices").get("test")
+    if slices:
+        names = [k for k in next(iter(slices.values())) if k != "n"]
         rows = [
-            [
-                html.escape(c["name"]),
-                "LANDED" if c["landed"] else "blocked",
-                "yes" if c["flagged"] else "no",
+            [html.escape(name), str(row["n"])]
+            + [
+                f"{row[k]['micro_f1']:.2f} ({row[k]['ci95'][0]:.2f}-{row[k]['ci95'][1]:.2f})"
+                for k in names
             ]
-            for v in attacks.values()
-            for c in v["cases"]
+            for name, row in slices.items()
+            if name != "at"
         ]
-        sections.append("<h2>Prompt injection</h2>" + _table(["Attack", "Result", "Flagged"], rows))
+        sections.append(
+            "<h2>Where it fails</h2><p>Micro-F1 on the test set by issue shape, with "
+            "bootstrap 95% intervals. Slices overlap.</p>" + _table(["Slice", "n", *names], rows)
+        )
+    if attacks:
+        rows = []
+        for key, v in attacks.items():
+            if "rates" in v:
+                r = v["rates"]
+                rows.append(
+                    [
+                        html.escape(key),
+                        f"{r['landed']['count']}/{r['landed']['n']}",
+                        f"{r['fooled_model']['count']}/{r['fooled_model']['n']}",
+                        f"{r['flagged']['count']}/{r['flagged']['n']}",
+                    ]
+                )
+        if rows:
+            sections.append(
+                "<h2>Prompt injection</h2><p>Each attack in 6 variants (verbatim, moved, "
+                "quoted, in a code block, zero-width spaces, look-alike letters). "
+                "<em>Landed</em> means a maintainer would see the attacker's outcome; "
+                "<em>fooled the model</em> counts the model's raw output, before the "
+                "policy layer routes flagged issues to a human.</p>"
+                + _table(["Run", "Landed", "Fooled the model", "Flagged"], rows)
+            )
     if shadow:
         sections.append(_shadow_section(shadow))
 

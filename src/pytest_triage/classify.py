@@ -145,6 +145,17 @@ def build_prompt(issue: dict, examples: list[dict], spotlight: bool = False) -> 
     )
 
 
+def assess_body(issue: dict, examples: list[dict], model: str, prompt: str) -> dict:
+    """The exact request `assess` sends (also fingerprinted by the regression gate)."""
+    return json_body(
+        PROMPTS[prompt],
+        build_prompt(issue, examples, spotlight=prompt in SPOTLIT),
+        SCHEMA,
+        model=model,
+        max_output_tokens=128,
+    )
+
+
 def assess(
     issue: dict,
     memory_index: IssueIndex,
@@ -160,14 +171,7 @@ def assess(
     examples = [
         memory_index.get(n) for n in memory_index.similar(issue, k=N_EXAMPLES, before=before)
     ]
-    body = json_body(
-        PROMPTS[prompt],
-        build_prompt(issue, [e for e in examples if e], spotlight=prompt in SPOTLIT),
-        SCHEMA,
-        model=model,
-        max_output_tokens=128,
-    )
-    data, _ = generate_json(body)
+    data, _ = generate_json(assess_body(issue, [e for e in examples if e], model, prompt))
     labels, missing = data.get("labels", []), data.get("missing", [])
     if not isinstance(labels, list) or not isinstance(missing, list):
         raise BadOutput(f"unexpected shape: {data!r}")
