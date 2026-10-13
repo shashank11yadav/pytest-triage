@@ -100,21 +100,38 @@ def cmd_eval_labels(args: argparse.Namespace) -> None:
 
 def cmd_eval_significance(args: argparse.Namespace) -> None:
     """Paired bootstrap on the test set, from cached predictions (free)."""
-    from pytest_triage import baselines
+    from pytest_triage import baselines, learned
     from pytest_triage.classify import make_llm_classifier
-    from pytest_triage.dataset import targets
+    from pytest_triage.dataset import is_evaluable, split, targets
     from pytest_triage.evaluate import _now, save_result
     from pytest_triage.metrics import bootstrap_diff
+    from pytest_triage.search import load_vectors
 
     _, test, memory_index = _label_setup("test")
+    # The trained classifier, exactly as in `eval learned --phase test`.
+    evaluable = [i for i in store.load_issues() if is_evaluable(i)]
+    vectors = dict(zip((i["number"] for i in evaluable), load_vectors(evaluable), strict=True))
+    memory, _ = split(evaluable)
+    fit, tune = split(memory, date=config.DEV_DATE)
+    vec = lambda issues: np.array([vectors[i["number"]] for i in issues])  # noqa: E731
+    model = learned.train(fit, vec(fit), tune, vec(tune))
     predictors = {
+        "llm v3s": make_llm_classifier(memory_index, prompt="v3s"),
         "llm v2": make_llm_classifier(memory_index, prompt="v2"),
         "llm v1": make_llm_classifier(memory_index, prompt="v1"),
+        "logreg": learned.as_predictor(model, vectors),
         "knn": baselines.make_knn(memory_index),
     }
     preds = {k: [f(i) for i in test] for k, f in predictors.items()}
     truth = [targets(i) for i in test]
-    for a, b in (("llm v2", "knn"), ("llm v1", "knn"), ("llm v2", "llm v1")):
+    for a, b in (
+        ("llm v3s", "logreg"),
+        ("llm v3s", "llm v2"),
+        ("llm v2", "logreg"),
+        ("llm v2", "llm v1"),
+        ("logreg", "knn"),
+        ("llm v1", "knn"),
+    ):
         result = bootstrap_diff(truth, preds[a], preds[b])
         save_result("significance", f"{a} vs {b}", result | {"n": len(test), "at": _now()})
         lo, hi = result["ci95"]
