@@ -53,19 +53,19 @@ fixed rather than a free-roaming agent, so cost and latency are predictable
 and each step can be evaluated on its own.
 
 ```mermaid
-flowchart LR
-    A[New issue] --> B["Redact secrets and home paths<br/>fence and datamark the text"]
-    B --> C["Assess (1 call)<br/>labels + missing info"]
-    K["5 most similar labelled<br/>past issues"] -.few-shot.-> C
-    B --> D["Expand (1 call)<br/>3 root-cause search queries"]
-    B --> E
-    D --> E["Search older issues<br/>BM25 + embeddings, fused with RRF<br/>issue's top 8 + queries' top 8"]
-    E --> F["Verify (1 call)<br/>which candidates are the same problem?"]
-    C --> G[Report]
-    F --> G
-    G --> H[Suggested labels]
-    G --> I["For maintainer review<br/>missing info, possible duplicates"]
-    G --> J["Reply draft<br/>only outputs at 70%+ precision"]
+flowchart TD
+    A[New issue] --> B["Redact secrets and paths<br/>fence and datamark the text"]
+    B --> C["Assess: 1 call<br/>labels + missing info"]
+    B --> D["Expand: 1 call<br/>3 root-cause queries"]
+    K["5 similar labelled<br/>past issues"] -. few-shot .-> C
+    B --> E["Search older issues<br/>BM25 + embeddings, RRF<br/>issue's top 8 + queries' top 8"]
+    D --> E
+    E --> F["Verify: 1 call<br/>which are the same problem?"]
+    C --> R[Report]
+    F --> R
+    R --> L[Suggested labels]
+    R --> M["For maintainer review<br/>missing info, possible duplicates"]
+    R --> P["Reply draft<br/>70%+ precision only"]
 ```
 
 A few details matter more than they look:
@@ -245,14 +245,15 @@ limits below matter more.
 ## Guardrails
 
 ```mermaid
-flowchart LR
-    I[Issue text] --> R["Redact<br/>tokens, keys, emails,<br/>usernames in paths"]
-    R --> F["Fence + datamark<br/>text can't close the tag;<br/>every space marked as data"]
+flowchart TD
+    I[Issue text] --> R["Redact<br/>tokens, keys, emails, usernames in paths"]
+    I --> D["Injection detector<br/>issue and its duplicate candidates"]
+    R --> F["Fence + datamark<br/>text can't close its tag"]
     F --> M[Model]
-    M --> V["Validate<br/>enums only,<br/>re-checked in code"]
-    V --> G["Gate<br/>reply only from outputs<br/>at 70%+ precision"]
+    M --> V["Validate<br/>enum outputs, re-checked in code"]
+    V --> G["Gate<br/>reply only from outputs at 70%+ precision"]
     G --> H[Maintainer]
-    I --> D["Injection detector<br/>issue and candidates"] --> H
+    D --> H
 ```
 
 - Redaction runs before any text leaves the machine. It removes GitHub and API
