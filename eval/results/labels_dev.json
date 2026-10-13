@@ -1,4 +1,480 @@
 {
+  "ensemble boost:0.8": {
+    "at": "2026-10-13T17:00:03+00:00",
+    "labels": {
+      "topic: collection": {
+        "f1": 0.6027397260273972,
+        "precision": 0.55,
+        "recall": 0.6666666666666666,
+        "support": 33
+      },
+      "topic: config": {
+        "f1": 0.42424242424242425,
+        "precision": 0.2916666666666667,
+        "recall": 0.7777777777777778,
+        "support": 9
+      },
+      "topic: fixtures": {
+        "f1": 0.7341772151898733,
+        "precision": 0.5918367346938775,
+        "recall": 0.9666666666666667,
+        "support": 30
+      },
+      "topic: parametrize": {
+        "f1": 0.6451612903225806,
+        "precision": 0.47619047619047616,
+        "recall": 1.0,
+        "support": 10
+      },
+      "topic: reporting": {
+        "f1": 0.5614035087719297,
+        "precision": 0.47058823529411764,
+        "recall": 0.6956521739130435,
+        "support": 23
+      },
+      "type: bug": {
+        "f1": 0.43930635838150284,
+        "precision": 0.296875,
+        "recall": 0.8444444444444444,
+        "support": 45
+      },
+      "type: docs": {
+        "f1": 0.8000000000000002,
+        "precision": 0.8,
+        "recall": 0.8,
+        "support": 25
+      },
+      "type: enhancement": {
+        "f1": 0.2608695652173913,
+        "precision": 0.16666666666666666,
+        "recall": 0.6,
+        "support": 15
+      },
+      "type: proposal": {
+        "f1": 0.625,
+        "precision": 0.5952380952380952,
+        "recall": 0.6578947368421053,
+        "support": 38
+      },
+      "type: question": {
+        "f1": 0.2,
+        "precision": 0.16666666666666666,
+        "recall": 0.25,
+        "support": 12
+      }
+    },
+    "macro_f1": 0.52929000881531,
+    "micro_f1": 0.5303703703703704,
+    "n": 256
+  },
+  "ensemble boost:0.9": {
+    "at": "2026-10-13T17:00:16+00:00",
+    "labels": {
+      "topic: collection": {
+        "f1": 0.6000000000000001,
+        "precision": 0.5675675675675675,
+        "recall": 0.6363636363636364,
+        "support": 33
+      },
+      "topic: config": {
+        "f1": 0.45161290322580644,
+        "precision": 0.3181818181818182,
+        "recall": 0.7777777777777778,
+        "support": 9
+      },
+      "topic: fixtures": {
+        "f1": 0.7341772151898733,
+        "precision": 0.5918367346938775,
+        "recall": 0.9666666666666667,
+        "support": 30
+      },
+      "topic: parametrize": {
+        "f1": 0.6451612903225806,
+        "precision": 0.47619047619047616,
+        "recall": 1.0,
+        "support": 10
+      },
+      "topic: reporting": {
+        "f1": 0.5714285714285715,
+        "precision": 0.48484848484848486,
+        "recall": 0.6956521739130435,
+        "support": 23
+      },
+      "type: bug": {
+        "f1": 0.4418604651162791,
+        "precision": 0.2992125984251969,
+        "recall": 0.8444444444444444,
+        "support": 45
+      },
+      "type: docs": {
+        "f1": 0.7916666666666667,
+        "precision": 0.8260869565217391,
+        "recall": 0.76,
+        "support": 25
+      },
+      "type: enhancement": {
+        "f1": 0.2769230769230769,
+        "precision": 0.18,
+        "recall": 0.6,
+        "support": 15
+      },
+      "type: proposal": {
+        "f1": 0.5675675675675677,
+        "precision": 0.5833333333333334,
+        "recall": 0.5526315789473685,
+        "support": 38
+      },
+      "type: question": {
+        "f1": 0.22222222222222224,
+        "precision": 0.2,
+        "recall": 0.25,
+        "support": 12
+      }
+    },
+    "macro_f1": 0.5302619978662644,
+    "micro_f1": 0.5298621745788668,
+    "n": 256
+  },
+  "ensemble gate:0.1": {
+    "at": "2026-10-13T16:59:16+00:00",
+    "labels": {
+      "topic: collection": {
+        "f1": 0.6000000000000001,
+        "precision": 0.5675675675675675,
+        "recall": 0.6363636363636364,
+        "support": 33
+      },
+      "topic: config": {
+        "f1": 0.4666666666666666,
+        "precision": 0.3333333333333333,
+        "recall": 0.7777777777777778,
+        "support": 9
+      },
+      "topic: fixtures": {
+        "f1": 0.7777777777777778,
+        "precision": 0.6666666666666666,
+        "recall": 0.9333333333333333,
+        "support": 30
+      },
+      "topic: parametrize": {
+        "f1": 0.6666666666666666,
+        "precision": 0.5,
+        "recall": 1.0,
+        "support": 10
+      },
+      "topic: reporting": {
+        "f1": 0.5818181818181818,
+        "precision": 0.5,
+        "recall": 0.6956521739130435,
+        "support": 23
+      },
+      "type: bug": {
+        "f1": 0.4444444444444445,
+        "precision": 0.30158730158730157,
+        "recall": 0.8444444444444444,
+        "support": 45
+      },
+      "type: docs": {
+        "f1": 0.7999999999999999,
+        "precision": 0.9,
+        "recall": 0.72,
+        "support": 25
+      },
+      "type: enhancement": {
+        "f1": 0.2769230769230769,
+        "precision": 0.18,
+        "recall": 0.6,
+        "support": 15
+      },
+      "type: proposal": {
+        "f1": 0.5833333333333334,
+        "precision": 0.6176470588235294,
+        "recall": 0.5526315789473685,
+        "support": 38
+      },
+      "type: question": {
+        "f1": 0.22222222222222224,
+        "precision": 0.2,
+        "recall": 0.25,
+        "support": 12
+      }
+    },
+    "macro_f1": 0.5419852369852369,
+    "micro_f1": 0.5368916797488226,
+    "n": 256
+  },
+  "ensemble gate:0.2": {
+    "at": "2026-10-13T16:59:38+00:00",
+    "labels": {
+      "topic: collection": {
+        "f1": 0.5797101449275361,
+        "precision": 0.5555555555555556,
+        "recall": 0.6060606060606061,
+        "support": 33
+      },
+      "topic: config": {
+        "f1": 0.48275862068965514,
+        "precision": 0.35,
+        "recall": 0.7777777777777778,
+        "support": 9
+      },
+      "topic: fixtures": {
+        "f1": 0.8,
+        "precision": 0.7,
+        "recall": 0.9333333333333333,
+        "support": 30
+      },
+      "topic: parametrize": {
+        "f1": 0.6666666666666666,
+        "precision": 0.5,
+        "recall": 1.0,
+        "support": 10
+      },
+      "topic: reporting": {
+        "f1": 0.6037735849056605,
+        "precision": 0.5333333333333333,
+        "recall": 0.6956521739130435,
+        "support": 23
+      },
+      "type: bug": {
+        "f1": 0.4404761904761905,
+        "precision": 0.3008130081300813,
+        "recall": 0.8222222222222222,
+        "support": 45
+      },
+      "type: docs": {
+        "f1": 0.8181818181818181,
+        "precision": 0.9473684210526315,
+        "recall": 0.72,
+        "support": 25
+      },
+      "type: enhancement": {
+        "f1": 0.29032258064516125,
+        "precision": 0.19148936170212766,
+        "recall": 0.6,
+        "support": 15
+      },
+      "type: proposal": {
+        "f1": 0.5915492957746479,
+        "precision": 0.6363636363636364,
+        "recall": 0.5526315789473685,
+        "support": 38
+      },
+      "type: question": {
+        "f1": 0.22222222222222224,
+        "precision": 0.2,
+        "recall": 0.25,
+        "support": 12
+      }
+    },
+    "macro_f1": 0.5495661124489558,
+    "micro_f1": 0.5425361155698234,
+    "n": 256
+  },
+  "ensemble gate:0.2+boost:0.9": {
+    "at": "2026-10-13T17:00:28+00:00",
+    "labels": {
+      "topic: collection": {
+        "f1": 0.5797101449275361,
+        "precision": 0.5555555555555556,
+        "recall": 0.6060606060606061,
+        "support": 33
+      },
+      "topic: config": {
+        "f1": 0.4666666666666666,
+        "precision": 0.3333333333333333,
+        "recall": 0.7777777777777778,
+        "support": 9
+      },
+      "topic: fixtures": {
+        "f1": 0.8169014084507042,
+        "precision": 0.7073170731707317,
+        "recall": 0.9666666666666667,
+        "support": 30
+      },
+      "topic: parametrize": {
+        "f1": 0.6451612903225806,
+        "precision": 0.47619047619047616,
+        "recall": 1.0,
+        "support": 10
+      },
+      "topic: reporting": {
+        "f1": 0.5925925925925926,
+        "precision": 0.5161290322580645,
+        "recall": 0.6956521739130435,
+        "support": 23
+      },
+      "type: bug": {
+        "f1": 0.4404761904761905,
+        "precision": 0.3008130081300813,
+        "recall": 0.8222222222222222,
+        "support": 45
+      },
+      "type: docs": {
+        "f1": 0.8085106382978724,
+        "precision": 0.8636363636363636,
+        "recall": 0.76,
+        "support": 25
+      },
+      "type: enhancement": {
+        "f1": 0.29032258064516125,
+        "precision": 0.19148936170212766,
+        "recall": 0.6,
+        "support": 15
+      },
+      "type: proposal": {
+        "f1": 0.5833333333333334,
+        "precision": 0.6176470588235294,
+        "recall": 0.5526315789473685,
+        "support": 38
+      },
+      "type: question": {
+        "f1": 0.22222222222222224,
+        "precision": 0.2,
+        "recall": 0.25,
+        "support": 12
+      }
+    },
+    "macro_f1": 0.544589706793486,
+    "micro_f1": 0.5419968304278922,
+    "n": 256
+  },
+  "ensemble gate:0.3": {
+    "at": "2026-10-13T16:59:51+00:00",
+    "labels": {
+      "topic: collection": {
+        "f1": 0.5797101449275361,
+        "precision": 0.5555555555555556,
+        "recall": 0.6060606060606061,
+        "support": 33
+      },
+      "topic: config": {
+        "f1": 0.48275862068965514,
+        "precision": 0.35,
+        "recall": 0.7777777777777778,
+        "support": 9
+      },
+      "topic: fixtures": {
+        "f1": 0.8115942028985509,
+        "precision": 0.717948717948718,
+        "recall": 0.9333333333333333,
+        "support": 30
+      },
+      "topic: parametrize": {
+        "f1": 0.6896551724137931,
+        "precision": 0.5263157894736842,
+        "recall": 1.0,
+        "support": 10
+      },
+      "topic: reporting": {
+        "f1": 0.5490196078431373,
+        "precision": 0.5,
+        "recall": 0.6086956521739131,
+        "support": 23
+      },
+      "type: bug": {
+        "f1": 0.445859872611465,
+        "precision": 0.3125,
+        "recall": 0.7777777777777778,
+        "support": 45
+      },
+      "type: docs": {
+        "f1": 0.8181818181818181,
+        "precision": 0.9473684210526315,
+        "recall": 0.72,
+        "support": 25
+      },
+      "type: enhancement": {
+        "f1": 0.30508474576271183,
+        "precision": 0.20454545454545456,
+        "recall": 0.6,
+        "support": 15
+      },
+      "type: proposal": {
+        "f1": 0.5915492957746479,
+        "precision": 0.6363636363636364,
+        "recall": 0.5526315789473685,
+        "support": 38
+      },
+      "type: question": {
+        "f1": 0.22222222222222224,
+        "precision": 0.2,
+        "recall": 0.25,
+        "support": 12
+      }
+    },
+    "macro_f1": 0.5495635703325538,
+    "micro_f1": 0.5454545454545454,
+    "n": 256
+  },
+  "ensemble route": {
+    "at": "2026-10-13T17:00:53+00:00",
+    "labels": {
+      "topic: collection": {
+        "f1": 0.6216216216216217,
+        "precision": 0.5609756097560976,
+        "recall": 0.696969696969697,
+        "support": 33
+      },
+      "topic: config": {
+        "f1": 0.5185185185185185,
+        "precision": 0.3888888888888889,
+        "recall": 0.7777777777777778,
+        "support": 9
+      },
+      "topic: fixtures": {
+        "f1": 0.8169014084507042,
+        "precision": 0.7073170731707317,
+        "recall": 0.9666666666666667,
+        "support": 30
+      },
+      "topic: parametrize": {
+        "f1": 0.6666666666666666,
+        "precision": 0.5,
+        "recall": 1.0,
+        "support": 10
+      },
+      "topic: reporting": {
+        "f1": 0.5818181818181818,
+        "precision": 0.5,
+        "recall": 0.6956521739130435,
+        "support": 23
+      },
+      "type: bug": {
+        "f1": 0.45517241379310347,
+        "precision": 0.33,
+        "recall": 0.7333333333333333,
+        "support": 45
+      },
+      "type: docs": {
+        "f1": 0.7999999999999999,
+        "precision": 0.9,
+        "recall": 0.72,
+        "support": 25
+      },
+      "type: enhancement": {
+        "f1": 0.2769230769230769,
+        "precision": 0.18,
+        "recall": 0.6,
+        "support": 15
+      },
+      "type: proposal": {
+        "f1": 0.625,
+        "precision": 0.5172413793103449,
+        "recall": 0.7894736842105263,
+        "support": 38
+      },
+      "type: question": {
+        "f1": 0.22222222222222224,
+        "precision": 0.2,
+        "recall": 0.25,
+        "support": 12
+      }
+    },
+    "macro_f1": 0.5584844110014096,
+    "micro_f1": 0.5606299212598426,
+    "n": 256
+  },
   "everything": {
     "at": "2026-10-12T17:57:31+00:00",
     "labels": {
@@ -405,6 +881,74 @@
     },
     "macro_f1": 0.5630331170165147,
     "micro_f1": 0.5800316957210777,
+    "n": 256
+  },
+  "logreg": {
+    "at": "2026-10-13T16:58:55+00:00",
+    "labels": {
+      "topic: collection": {
+        "f1": 0.6216216216216217,
+        "precision": 0.5609756097560976,
+        "recall": 0.696969696969697,
+        "support": 33
+      },
+      "topic: config": {
+        "f1": 0.5185185185185185,
+        "precision": 0.3888888888888889,
+        "recall": 0.7777777777777778,
+        "support": 9
+      },
+      "topic: fixtures": {
+        "f1": 0.8169014084507042,
+        "precision": 0.7073170731707317,
+        "recall": 0.9666666666666667,
+        "support": 30
+      },
+      "topic: parametrize": {
+        "f1": 0.625,
+        "precision": 0.45454545454545453,
+        "recall": 1.0,
+        "support": 10
+      },
+      "topic: reporting": {
+        "f1": 0.26666666666666666,
+        "precision": 0.5714285714285714,
+        "recall": 0.17391304347826086,
+        "support": 23
+      },
+      "type: bug": {
+        "f1": 0.45517241379310347,
+        "precision": 0.33,
+        "recall": 0.7333333333333333,
+        "support": 45
+      },
+      "type: docs": {
+        "f1": 0.6666666666666666,
+        "precision": 0.8235294117647058,
+        "recall": 0.56,
+        "support": 25
+      },
+      "type: enhancement": {
+        "f1": 0.2769230769230769,
+        "precision": 0.18,
+        "recall": 0.6,
+        "support": 15
+      },
+      "type: proposal": {
+        "f1": 0.625,
+        "precision": 0.5172413793103449,
+        "recall": 0.7894736842105263,
+        "support": 38
+      },
+      "type: question": {
+        "f1": 0.16666666666666666,
+        "precision": 0.1111111111111111,
+        "recall": 0.3333333333333333,
+        "support": 12
+      }
+    },
+    "macro_f1": 0.5039137039307025,
+    "micro_f1": 0.5174603174603174,
     "n": 256
   },
   "majority": {

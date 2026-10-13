@@ -1,0 +1,12 @@
+{
+  "type: bug": "logreg",
+  "type: question": "llm",
+  "type: enhancement": "llm",
+  "type: proposal": "logreg",
+  "type: docs": "llm",
+  "topic: fixtures": "logreg",
+  "topic: reporting": "llm",
+  "topic: collection": "logreg",
+  "topic: config": "logreg",
+  "topic: parametrize": "llm"
+}

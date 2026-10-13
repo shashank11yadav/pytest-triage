@@ -28,6 +28,7 @@ Each number below is produced from `eval/results/` by the `triage eval …` and
 |---|---|---|
 | **Gemini 3.5 Flash-Lite, prompt v2 (chosen on dev)** | **0.55** | **0.53** |
 | Gemini 3.5 Flash-Lite, prompt v1 | 0.52 | 0.51 |
+| **Logistic regression per label on embeddings, trained on past labels (free)** | **0.46** | 0.42 |
 | kNN label vote of similar past issues (free) | 0.41 | 0.39 |
 | Keywords mined from past titles (free) | 0.36 | 0.39 |
 | Predict every label | 0.18 | 0.18 |
@@ -41,10 +42,16 @@ the test issues, from `triage eval significance`):
 | LLM v1 vs. free kNN | **+0.12** | +0.06 to +0.17 |
 | LLM v2 vs. free kNN | +0.14 | +0.08 to +0.20 |
 | LLM v2 vs. LLM v1 | +0.02 | −0.01 to +0.05 (**not significant**) |
+| **LLM v2 vs. trained classifier (best free method)** | **+0.085** | +0.03 to +0.14 |
+| Trained classifier vs. kNN | +0.055 | +0.00 to +0.11 |
 
-**The clean headline is v1's +0.12 over kNN.** v1 was designed before any test
-result was seen. v2's rules were motivated partly by v1's errors on test, and
-v2's extra gain is within noise.
+**The honest headline is +0.085 over the best free method.** That method is
+a per-label logistic regression trained on the 4,459 labelled issues before
+2024, with each label's threshold tuned on 2024. Issue-classification
+competitions are usually won by trained models like this one, so it is the
+baseline an LLM has to justify its cost against. Against kNN the gap looks
+bigger (+0.12 for v1), but kNN is the weaker baseline. v2's extra gain over
+v1 is within noise.
 
 The LLM's biggest gains are on labels that depend on **intent**:
 `type: docs` 0.80 vs. 0.40, `type: question` 0.50 vs. 0.25, and
@@ -187,10 +194,25 @@ new issue
   dev macro-F1, at 2.7× the cost per call and with a worse needs-info score.
 - **Free baselines first.** A kNN vote over embeddings costs nothing and
   scores 0.41. An LLM that can't beat it isn't worth paying for.
-- **Things that were tried and rejected, on dev:**
-  - Keeping LLM topic labels only when neighbours agree: +0.015, which is noise.
-  - kNN for topics: −0.03.
-  - Stricter needs-info rules: no gain.
+- **Things that were tried and rejected:**
+  - **LLM + trained-classifier ensembles.** Variants were chosen on dev:
+    - gating LLM labels by the classifier's probability
+    - adding labels the classifier is confident about
+    - per-label routing to whichever source did better
+
+    They gained +0.015 to +0.025 on dev but **−0.001 and −0.008 on test**
+    (CIs span zero). The dev gains didn't hold up, so the pipeline stays
+    LLM-only.
+  - **Local cross-encoder rerankers for duplicates.** bge-reranker-v2-m3
+    and MiniLM rerank a wide pool of up to 100 candidates down to 16. Both
+    found fewer originals than the union pool (8/15 vs. 10/15), and took 6–65 s per issue.
+    They're trained on web question-answering, not "same root cause". The
+    wide pool *contains* 14/15 originals, so the open problem is choosing
+    from it, not retrieving it.
+  - Keeping LLM topic labels only when neighbours agree: +0.015 on dev, which
+    is noise.
+  - kNN for topic labels: −0.03 on dev.
+  - Stricter needs-info rules: no gain on dev.
 - **One call does two jobs.** Labels and missing information come from the
   same request.
 - **What reaches a reporter is gated by measured precision.** Only outputs
@@ -254,6 +276,9 @@ uv run triage eval labels --llm     # + Gemini (costs about $0.13)
 uv run triage eval dupes [--llm]    # duplicate search / verifier
 uv run triage eval attacks          # prompt-injection suite (19 attack/control pairs)
 uv run triage eval significance     # paired bootstrap of label gaps (free)
+uv run triage eval learned --phase dev   # trained classifier + ensembles, chosen on dev (free)
+uv run triage eval learned --phase test --variants gate:0.3 route
+uv run triage eval rerank           # local rerankers vs. the union candidate pool (free)
 uv run triage issue 14476           # triage one issue
 uv run triage shadow --since 2026-10-01 && uv run triage shadow-score
 uv run triage audit rate --rater YOU # blind human audit of "false positive" labels

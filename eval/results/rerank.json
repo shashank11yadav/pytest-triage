@@ -1,0 +1,20 @@
+{
+  "candidate_recall": {
+    "at": "2026-10-13T18:03:46+00:00",
+    "n": 15,
+    "rerankers": {
+      "BAAI/bge-reranker-v2-m3-int8": {
+        "s_per_issue": 65.31008485158284,
+        "top16": 8,
+        "top8": 6
+      },
+      "Xenova/ms-marco-MiniLM-L-12-v2": {
+        "s_per_issue": 5.803974723815918,
+        "top16": 8,
+        "top8": 7
+      }
+    },
+    "union_8_8": 10,
+    "wide_pool_ceiling": 14
+  }
+}

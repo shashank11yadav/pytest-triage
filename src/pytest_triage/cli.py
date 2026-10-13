@@ -4,6 +4,8 @@ import argparse
 import json
 from collections import Counter
 
+import numpy as np
+
 from pytest_triage import config, store
 
 
@@ -117,6 +119,93 @@ def cmd_eval_significance(args: argparse.Namespace) -> None:
         save_result("significance", f"{a} vs {b}", result | {"n": len(test), "at": _now()})
         lo, hi = result["ci95"]
         print(f"{a} - {b}: {result['diff']:+.3f}  95% CI [{lo:+.3f}, {hi:+.3f}]")
+
+
+def cmd_eval_learned(args: argparse.Namespace) -> None:
+    """Trained classifier + LLM ensembles. --phase dev chooses; --phase test runs once."""
+    from pytest_triage import learned
+    from pytest_triage.classify import make_llm_classifier
+    from pytest_triage.dataset import is_evaluable, split, targets
+    from pytest_triage.evaluate import eval_labels
+    from pytest_triage.metrics import confusion, label_report
+    from pytest_triage.search import IssueIndex, load_vectors
+
+    evaluable = [i for i in store.load_issues() if is_evaluable(i)]
+    vectors = dict(zip((i["number"] for i in evaluable), load_vectors(evaluable), strict=True))
+    vec = lambda issues: np.array([vectors[i["number"]] for i in issues])  # noqa: E731
+    memory, test = split(evaluable)
+    train_, dev = split(memory, date=config.DEV_DATE)  # < 2024, 2024
+    if args.phase == "dev":
+        fit, tune = split(train_, date="2023-01-01")  # < 2023, 2023
+        scored, llm_memory, suffix = dev, train_, "_dev"
+    else:
+        fit, tune = train_, dev  # < 2024, 2024
+        scored, llm_memory, suffix = test, memory, ""
+
+    model = learned.train(fit, vec(fit), tune, vec(tune))
+    thresholds = dict(zip(config.LABELS, model.thresholds.tolist(), strict=True))
+    print(f"logreg: C={model.C}, thresholds {thresholds}")
+    llm = make_llm_classifier(IssueIndex.build(llm_memory), prompt=config.LABEL_PROMPT)
+    probs = learned.proba_lookup(model, vectors)
+    logreg = learned.as_predictor(model, vectors)
+
+    def ens(variant, route=None):
+        return lambda i: learned.combine(llm(i), probs(i), variant, route, logreg(i))
+
+    if args.phase == "dev":
+        predictors = {"logreg": logreg}
+        for v in (
+            "gate:0.1",
+            "gate:0.2",
+            "gate:0.3",
+            "boost:0.8",
+            "boost:0.9",
+            "gate:0.2+boost:0.9",
+        ):
+            predictors[f"ensemble {v}"] = ens(v)
+        results = eval_labels(predictors, scored, file=f"labels{suffix}")
+        # Routing: per label, whichever of llm / logreg had the higher F1 on dev.
+        llm_dev = label_report(confusion((targets(i), llm(i)) for i in scored))["labels"]
+        route = {
+            lbl: "llm" if llm_dev[lbl]["f1"] >= results["logreg"]["labels"][lbl]["f1"] else "logreg"
+            for lbl in config.LABELS
+        }
+        print("route:", route)
+        eval_labels({"ensemble route": ens("route", route)}, scored, file=f"labels{suffix}")
+        (config.RESULTS / "route.json").write_text(json.dumps(route, indent=2) + "\n")
+    else:
+        route = json.loads((config.RESULTS / "route.json").read_text())
+        predictors = {"logreg": logreg}
+        for v in args.variants:
+            predictors[f"ensemble {v}"] = ens(v, route if v == "route" else None)
+        eval_labels(predictors, scored, file=f"labels{suffix}")
+
+        from pytest_triage import baselines
+        from pytest_triage.evaluate import _now, save_result
+        from pytest_triage.metrics import bootstrap_diff
+
+        truth = [targets(i) for i in scored]
+        llm_p = [llm(i) for i in scored]
+        knn = baselines.make_knn(IssueIndex.build(memory))
+        pairs = {
+            "logreg vs knn": ([logreg(i) for i in scored], [knn(i) for i in scored]),
+            "llm v2 vs logreg": (llm_p, [logreg(i) for i in scored]),
+        }
+        for name, predict in predictors.items():
+            if name.startswith("ensemble"):
+                pairs[f"{name} vs llm v2"] = ([predict(i) for i in scored], llm_p)
+        for name, (a, b) in pairs.items():
+            r = bootstrap_diff(truth, a, b)
+            save_result("significance", name, r | {"n": len(scored), "at": _now()})
+            print(f"{name}: {r['diff']:+.3f}  95% CI [{r['ci95'][0]:+.3f}, {r['ci95'][1]:+.3f}]")
+
+
+def cmd_eval_rerank(args: argparse.Namespace) -> None:
+    from pytest_triage.evaluate import eval_rerank
+    from pytest_triage.search import IssueIndex
+
+    truth = {int(k): v for k, v in json.loads(config.DUPLICATES.read_text()).items()}
+    eval_rerank(IssueIndex.build(store.load_issues()), truth, args.models)
 
 
 def cmd_eval_dupes(args: argparse.Namespace) -> None:
@@ -316,6 +405,17 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument("--model", default=config.WORKHORSE)
     p.set_defaults(func=cmd_eval_dupes)
+    p = ev.add_parser("rerank", help="local cross-encoder rerankers vs. the union pool (free)")
+    p.add_argument(
+        "--models",
+        nargs="*",
+        default=["Xenova/ms-marco-MiniLM-L-12-v2", "BAAI/bge-reranker-v2-m3-int8"],
+    )
+    p.set_defaults(func=cmd_eval_rerank)
+    p = ev.add_parser("learned", help="trained classifier + LLM ensembles (free, cached)")
+    p.add_argument("--phase", choices=["dev", "test"], default="dev")
+    p.add_argument("--variants", nargs="*", default=[], help="ensembles to run on test")
+    p.set_defaults(func=cmd_eval_learned)
     ev.add_parser(
         "significance", help="paired bootstrap of macro-F1 gaps (free, cached)"
     ).set_defaults(func=cmd_eval_significance)

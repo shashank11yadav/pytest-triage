@@ -194,3 +194,61 @@ def eval_needs_info(
         f"(support {tp + fn}, flagged {tp + fp}, n={len(test)})"
     )
     return result
+
+
+def eval_rerank(index: IssueIndex, truth: dict[int, list[int]], models: list[str]) -> dict:
+    """Does a local cross-encoder pick the original out of a wide pool better than
+    the union pool? Free: expansion queries are cached, rerankers run locally.
+
+    wide pool = issue's own top 50 + expansion queries' top 50 (the recall ceiling)
+    """
+    import time
+
+    from fastembed.rerank.cross_encoder import TextCrossEncoder
+
+    from pytest_triage.dedupe import candidates, expand_queries
+    from pytest_triage.metrics import duplicate_clusters
+    from pytest_triage.search import rrf
+
+    clusters = duplicate_clusters(truth)
+
+    def text(issue: dict, chars: int) -> str:
+        return f"{issue['title']}\n{(issue['body'] or '')[:chars]}"
+
+    pools = {}
+    for n in truth:
+        q = index.get(n)
+        queries = expand_queries(q)
+        own = index.similar(q, k=50)
+        extra = [x for x in rrf(index.search_texts(queries, index.allowed_for(q))) if x not in own]
+        pools[n] = (q, own + extra[:50], candidates(q, index, queries))
+
+    def found(n: int, pool: list[int]) -> bool:
+        return bool((clusters[n] - {n}) & set(pool))
+
+    result = {
+        "n": len(truth),
+        "union_8_8": sum(found(n, c) for n, (_, _, c) in pools.items()),
+        "wide_pool_ceiling": sum(found(n, w) for n, (_, w, _) in pools.items()),
+        "rerankers": {},
+    }
+    for name in models:
+        encoder, started, top = TextCrossEncoder(name), time.time(), {8: 0, 16: 0}
+        for n, (q, wide, _) in pools.items():
+            scores = list(encoder.rerank(text(q, 1000), [text(index.get(c), 600) for c in wide]))
+            order = [c for _, c in sorted(zip(scores, wide, strict=True), key=lambda x: -x[0])]
+            for k in top:
+                top[k] += found(n, order[:k])
+        seconds = (time.time() - started) / len(pools)
+        result["rerankers"][name] = {"top8": top[8], "top16": top[16], "s_per_issue": seconds}
+        print(
+            f"  {name:<34} top8 {top[8]}/{len(pools)}  top16 {top[16]}/{len(pools)}  "
+            f"{seconds:.1f}s/issue",
+            flush=True,
+        )
+    print(
+        f"  union pool (8+8): {result['union_8_8']}/{len(pools)}; "
+        f"wide-pool ceiling: {result['wide_pool_ceiling']}/{len(pools)}"
+    )
+    save_result("rerank", "candidate_recall", result | {"at": _now()})
+    return result
