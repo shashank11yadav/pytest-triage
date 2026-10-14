@@ -273,9 +273,13 @@ def cached_comments(
 # --- scoring -----------------------------------------------------------------------
 
 
-def score(rater: str, plan: dict, directory: Path = GUIDED) -> dict:
+def score(rater: str, plan: dict, directory: Path = GUIDED, conflicts: set | None = None) -> dict:
     """Warm-up agreement, adjusted type-label precision, and agreement with any
-    other rater who answered the same main items."""
+    other rater who answered the same main items.
+
+    `conflicts`: (number, label) items where maintainers chose a DIFFERENT type.
+    A yes/no question can't settle those (an issue can report a crash and also
+    ask for a change), so the cautious estimate counts them all as wrong."""
     from pytest_triage.audit import adjusted_precision, cohen_kappa
     from pytest_triage.metrics import wilson
 
@@ -289,6 +293,12 @@ def score(rater: str, plan: dict, directory: Path = GUIDED) -> dict:
         "warmup_judged": len(warm),
         "warmup_ci95": list(wilson(matched, len(warm))),
         "main": adjusted_precision(meta["tp"], meta["fp"], list(mine.values())),
+        "cautious": adjusted_precision(
+            meta["tp"],
+            meta["fp"],
+            ["wrong" if k in (conflicts or set()) else v for k, v in mine.items()],
+        ),
+        "conflicts": sum(k in (conflicts or set()) for k in mine),
         "meta": meta,
         "agreement": {},
     }

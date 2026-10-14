@@ -97,3 +97,12 @@ def test_score_reports_warmup_precision_and_agreement(tmp_path):
     assert result["main"]["share_of_fps_correct"] == 1.0
     assert result["main"]["adjusted_precision"] == 1.0  # 10 tp + all 10 fp judged correct
     assert result["agreement"]["other"]["same"] == 1
+
+
+def test_cautious_score_counts_type_conflicts_as_wrong(tmp_path):
+    session(["2", "3", "y"], plan(), tmp_path)
+    conflict = {(3, "type: bug")}
+    result = guided.score("me", plan(), tmp_path, conflicts=conflict)
+    assert result["main"]["share_of_fps_correct"] == 1.0
+    assert result["cautious"]["share_of_fps_correct"] == 0.0
+    assert result["conflicts"] == 1

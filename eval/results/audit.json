@@ -1,7 +1,29 @@
 {
   "guided type labels (ai-gemini-3.8-flash)": {
-    "agreement": {},
-    "at": "2026-10-14T17:03:17+00:00",
+    "agreement": {
+      "human": {
+        "items": 50,
+        "kappa": 0.56140350877193,
+        "same": 46
+      }
+    },
+    "at": "2026-10-14T18:20:47+00:00",
+    "cautious": {
+      "adjusted_ci95": [
+        0.6300604889348226,
+        0.7953621300579009
+      ],
+      "adjusted_precision": 0.7144827586206897,
+      "measured_precision": 0.3793103448275862,
+      "rated": 50,
+      "share_ci95": [
+        0.40398634328388083,
+        0.6703056539821737
+      ],
+      "share_of_fps_correct": 0.54,
+      "unsure": 0
+    },
+    "conflicts": 21,
     "main": {
       "adjusted_ci95": [
         0.8649588844932892,
@@ -36,6 +58,66 @@
     ],
     "warmup_judged": 0,
     "warmup_matched": 0
+  },
+  "guided type labels (human)": {
+    "agreement": {
+      "ai-gemini-3.8-flash": {
+        "items": 50,
+        "kappa": 0.56140350877193,
+        "same": 46
+      }
+    },
+    "at": "2026-10-14T18:20:47+00:00",
+    "cautious": {
+      "adjusted_ci95": [
+        0.6300604889348226,
+        0.7953621300579009
+      ],
+      "adjusted_precision": 0.7144827586206897,
+      "measured_precision": 0.3793103448275862,
+      "rated": 50,
+      "share_ci95": [
+        0.40398634328388083,
+        0.6703056539821737
+      ],
+      "share_of_fps_correct": 0.54,
+      "unsure": 0
+    },
+    "conflicts": 21,
+    "main": {
+      "adjusted_ci95": [
+        0.8830713635133975,
+        0.9804178600481299
+      ],
+      "adjusted_precision": 0.950344827586207,
+      "measured_precision": 0.3793103448275862,
+      "rated": 50,
+      "share_ci95": [
+        0.8116149745493629,
+        0.9684509967442093
+      ],
+      "share_of_fps_correct": 0.92,
+      "unsure": 0
+    },
+    "meta": {
+      "fp": 144,
+      "labels": "type: only",
+      "n_issues": 237,
+      "predictor": "llm:gemini-3.5-flash-lite:v3s",
+      "sample_size": 50,
+      "seeds": {
+        "main": 11,
+        "warmup": 5
+      },
+      "tp": 88
+    },
+    "rater": "human",
+    "warmup_ci95": [
+      0.3126695474501864,
+      0.8318224187964902
+    ],
+    "warmup_judged": 10,
+    "warmup_matched": 6
   },
   "labels": {
     "agreed_items": 50,

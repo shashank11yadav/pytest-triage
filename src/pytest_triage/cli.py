@@ -560,7 +560,13 @@ def _guided(args: argparse.Namespace, test: list[dict], memory_index) -> None:
         rater = guided.rate_with_model(plan, by_number, args.model)
         print(f"AI rater done -> {guided.answers_path(rater, 'main')}")
     else:
-        result = guided.score(args.rater, plan)
+
+        def other_type(item: dict) -> bool:
+            given = {x for x in by_number[item["number"]]["labels"] if x.startswith("type:")}
+            return bool(given) and item["label"] not in given
+
+        conflicts = {(m["number"], m["label"]) for m in plan["main"] if other_type(m)}
+        result = guided.score(args.rater, plan, conflicts=conflicts)
         save_result("audit", f"guided type labels ({args.rater})", result | {"at": _now()})
         m = result["main"]
         print(
@@ -570,7 +576,11 @@ def _guided(args: argparse.Namespace, test: list[dict], memory_index) -> None:
             f"{m['share_of_fps_correct']:.0%} of the disputed type labels judged correct\n"
             f"type-label precision: measured {m['measured_precision']:.2f}, "
             f"adjusted {m['adjusted_precision']:.2f} "
-            f"({m['adjusted_ci95'][0]:.2f}-{m['adjusted_ci95'][1]:.2f})"
+            f"({m['adjusted_ci95'][0]:.2f}-{m['adjusted_ci95'][1]:.2f})\n"
+            f"cautious (the {result['conflicts']} items where maintainers chose another "
+            f"type counted as wrong): {result['cautious']['adjusted_precision']:.2f} "
+            f"({result['cautious']['adjusted_ci95'][0]:.2f}-"
+            f"{result['cautious']['adjusted_ci95'][1]:.2f})"
         )
         for other, a in result["agreement"].items():
             print(f"agreement with {other}: {a['same']}/{a['items']} (kappa {a['kappa']:.2f})")

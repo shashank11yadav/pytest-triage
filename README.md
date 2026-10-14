@@ -32,7 +32,8 @@ onward that maintainers labelled.
 | What | Result | Compared with |
 |---|---|---|
 | Labels (10 labels, macro-F1) | **0.56** | 0.46 for the best free method, a gap of +0.095 (95% CI +0.04 to +0.14) |
-| Label precision, adjusted for labels maintainers skip | about **0.65 to 0.75** | 0.43 measured against maintainer labels alone (see [the audit](#how-precise-are-the-labels-really)) |
+| Label precision, adjusted for labels maintainers skip | about **0.65 to 0.75** (two LLM raters, all labels) | 0.43 measured against maintainer labels alone (see [the audit](#how-precise-are-the-labels-really)) |
+| Type-label precision, from a guided human check | **0.71 to 0.95** | 0.38 against maintainer labels alone (see [the human check](#a-human-check-of-the-type-labels)) |
 | High-precision mode (labels shown only when a second model agrees) | 82% precise on 17% of issues | threshold chosen on dev, see [below](#high-precision-mode) |
 | Needs more information (F1) | 0.42 | 0.24 for flagging every issue |
 | Duplicates found (15 known pairs) | 7 of 15 | 5 of 15 for search alone |
@@ -199,15 +200,61 @@ judge them blind:
 | Gemini 3.8 Flash | 51% | 0.72 (0.64 to 0.80) |
 | Only if both agree | 38% | 0.65 |
 
-The raters agreed on 34 of 50 (Cohen's kappa 0.41, moderate). Both are LLMs
-and no human rated these, so treat 0.65 to 0.75 as an indication rather than a
-measurement. Rater A had also seen how the classifier prompt was designed.
+The raters agreed on 34 of 50 (Cohen's kappa 0.41, moderate). Both are LLMs,
+so treat 0.65 to 0.75 as an indication rather than a measurement. Rater A had
+also seen how the classifier prompt was designed. The human check below covers
+the `type:` labels.
 
 Most labels that both raters called wrong fell into three groups:
 enhancement versus proposal, `topic: fixtures` on issues about one specific
 built-in fixture, and `topic: reporting` on things that aren't terminal
 output. Prompt v3s fixed part of the fixtures problem: its precision went from
 0.56 to 0.68, with recall falling from 1.00 to 0.75.
+
+### A human check of the type labels
+
+I'm not a pytest maintainer, so instead of labelling issues from scratch I
+built a guided check (`triage audit guided`). It shows one issue at a time,
+with any maintainer replies, and asks one plain question about what the
+reporter wrote, such as "Is the reporter mainly asking how to do something?".
+It covers only the five `type:` labels, because those can be judged from the
+text. The `topic:` labels need knowledge of pytest's internals.
+
+```mermaid
+flowchart LR
+    W["Warm-up<br/>10 issues, answer known<br/>pick the kind of issue"] --> M["Main round<br/>50 disputed type labels<br/>one yes/no question each"]
+    M --> S["Score<br/>vs. maintainers and vs.<br/>an AI rater given the same questions"]
+```
+
+Results, on the current prompt (v3s) and the test set:
+
+| | Result |
+|---|---|
+| Warm-up: matched the maintainers' type | 6 of 10 |
+| Disputed type labels I judged correct | 46 of 50 |
+| Agreement with an AI rater answering the same questions blind | 46 of 50 (kappa 0.56) |
+| Type-label precision against maintainer labels alone | 0.38 |
+| Adjusted for my answers | 0.95 (0.88 to 0.98) |
+| Cautious: every label that conflicts with a maintainer's type counted as wrong | 0.71 (0.63 to 0.80) |
+
+Who chose what matters here:
+- 29 of the 50 disputed labels are on issues where maintainers chose no type
+  at all. I judged 27 of those correct. Most of the model's "extra" type
+  labels fill in a blank rather than contradict anyone.
+- 21 are on issues where maintainers chose a different type. A yes/no
+  question can't settle those, because an issue can report a crash and also
+  ask for a change. That's why the cautious row counts them all as wrong. Six
+  of the 21 are `type: regression`, which is a kind of bug, so the model's
+  `type: bug` there is arguably right. The tool's label set doesn't include
+  it.
+
+The honest reading is that type-label precision is somewhere between 0.71
+and 0.95, and closer to the top for issues maintainers leave untyped. Two
+limits: I'm one rater without pytest experience, and I matched the
+maintainers on 6 of 10 warm-up issues, below the 7 I'd set as the bar. My
+misses were mostly calling something a bug when maintainers saw it as a
+question or a docs problem. So this is supporting evidence, not a
+measurement.
 
 ### Where it fails
 
@@ -419,7 +466,8 @@ I also hit two undocumented API behaviours along the way:
 - The test sets are small: 11 to 44 examples per label, 15 duplicate pairs,
   and 19 hand-written attacks (104 runs with variants).
 - Maintainer labels are incomplete ground truth. The audit that corrects for
-  that used two LLM raters with moderate agreement and no human.
+  that used two LLM raters with moderate agreement, plus one non-expert human
+  for the type labels only.
 - The duplicate improvements and the injection fixes were measured on the
   data used to design them.
 - No pytest maintainer has used it yet. Usefulness is inferred from metrics,
