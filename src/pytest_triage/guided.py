@@ -41,7 +41,6 @@ QUESTIONS = {
     "type: proposal": "Is the reporter suggesting a new feature or idea where HOW it "
     "should work is still open for discussion?",
 }
-TYPES = list(QUESTIONS)
 
 # Warm-up choices. Enhancement and proposal are merged: the line between them is a
 # maintainer judgement call, not something a newcomer can read off the text.

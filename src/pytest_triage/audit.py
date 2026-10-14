@@ -17,7 +17,6 @@ Only numbers, labels and verdicts are stored - never issue text.
 
 import json
 import random
-from collections.abc import Callable
 from pathlib import Path
 
 from pytest_triage.config import EVAL
@@ -28,7 +27,6 @@ AUDIT = EVAL / "audit"
 SAMPLE = AUDIT / "sample.jsonl"
 META = AUDIT / "sample_meta.json"
 VERDICTS = {"c": "correct", "w": "wrong", "u": "unsure"}
-ISSUE_URL = "https://github.com/pytest-dev/pytest/issues/"
 
 
 def false_positives(issues: list[dict], predict: Predictor) -> tuple[list[dict], int]:
@@ -74,55 +72,6 @@ def add_rating(rater: str, item: dict, verdict: str, directory: Path = AUDIT) ->
     with ratings_path(rater, directory).open("a") as f:
         f.write(json.dumps({"number": item["number"], "label": item["label"], "verdict": verdict}))
         f.write("\n")
-
-
-def render_item(issue: dict, label: str, definition: str, position: str) -> str:
-    body = " ".join((issue["body"] or "").split())[:900]
-    return (
-        f"\n[{position}]  {ISSUE_URL}{issue['number']}\n"
-        f"Title: {issue['title']}\n"
-        f"Maintainers applied: {', '.join(issue['labels']) or '(none)'}\n"
-        f"Model ALSO suggested: >>> {label} <<<  ({definition})\n\n{body}\n"
-    )
-
-
-def rate_interactively(
-    rater: str,
-    sample: list[dict],
-    by_number: dict[int, dict],
-    definitions: dict[str, str],
-    ask: Callable[[str], str] = input,
-    show: Callable[[str], None] = print,
-    directory: Path = AUDIT,
-) -> int:
-    """Rate unrated items; resumable. Returns how many were rated this session."""
-    done = load_ratings(rater, directory)
-    todo = [s for s in sample if (s["number"], s["label"]) not in done]
-    show(
-        f"{len(done)} already rated, {len(todo)} to go. "
-        "Judge only whether the shown LABEL fits the issue."
-    )
-    rated = 0
-    for k, item in enumerate(todo, start=len(done) + 1):
-        show(
-            render_item(
-                by_number[item["number"]],
-                item["label"],
-                definitions[item["label"]],
-                f"{k}/{len(sample)}",
-            )
-        )
-        while (
-            answer := ask("Is this label correct? [c]orrect / [w]rong / [u]nsure / [q]uit: ")
-            .strip()
-            .lower()[:1]
-        ) not in (*VERDICTS, "q"):
-            show("Please type c, w, u or q.")
-        if answer == "q":
-            break
-        add_rating(rater, item, VERDICTS[answer], directory)
-        rated += 1
-    return rated
 
 
 def adjusted_precision(tp: int, fp: int, verdicts: list[str]) -> dict:

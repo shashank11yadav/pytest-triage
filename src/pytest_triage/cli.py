@@ -494,11 +494,6 @@ def cmd_audit(args: argparse.Namespace) -> None:
         print(
             f"{len(fps)} false-positive labels (tp={tp}); sampled {len(sample)} -> {audit.SAMPLE}"
         )
-    elif args.action == "rate":
-        sample, _ = audit.load_sample()
-        by_number = {i["number"]: i for i in test}
-        n = audit.rate_interactively(args.rater, sample, by_number, DEFINITIONS)
-        print(f"\nrated {n} this session -> {audit.ratings_path(args.rater)}")
     elif args.action == "rate-ai":
         sample, _ = audit.load_sample()
         by_number = {i["number"]: i for i in test}
@@ -667,12 +662,12 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("audit", help="human audit of the model's 'false positive' labels")
     p.add_argument(
         "action",
-        choices=["sample", "rate", "rate-ai", "score", "guided", "guided-ai", "guided-score"],
+        choices=["sample", "rate-ai", "score", "guided", "guided-ai", "guided-score"],
         help="guided = the step-by-step type-label check for non-experts",
     )
     p.add_argument("--model", default=config.STEP_UP, help="AI rater model (rate-ai)")
     p.add_argument("--n", type=int, default=50, help="sample size (sample, guided)")
-    p.add_argument("--rater", default="human", help="rater name (rate, guided)")
+    p.add_argument("--rater", default="human", help="rater name (guided)")
     p.set_defaults(func=cmd_audit)
 
     sub.add_parser("report", help="write docs/index.html + print README tables").set_defaults(

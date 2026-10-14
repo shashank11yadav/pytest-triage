@@ -25,38 +25,6 @@ def test_sample_is_reproducible_and_independent_of_input_order():
     assert len(audit.draw_sample(fps, 500)) == 100
 
 
-def test_rating_session_is_resumable_and_validates_input(tmp_path):
-    sample = [{"number": 1, "label": "type: bug"}, {"number": 2, "label": "type: docs"}]
-    by_number = {1: issue(1), 2: issue(2)}
-    defs = {"type: bug": "d", "type: docs": "d"}
-    answers = iter(["x", "c", "q"])  # invalid, then correct, then quit
-    shown = []
-    rated = audit.rate_interactively(
-        "me",
-        sample,
-        by_number,
-        defs,
-        ask=lambda _: next(answers),
-        show=shown.append,
-        directory=tmp_path,
-    )
-    assert rated == 1
-    assert any("Please type" in s for s in shown)
-    assert audit.load_ratings("me", tmp_path) == {(1, "type: bug"): "correct"}
-
-    answers = iter(["w"])
-    audit.rate_interactively(
-        "me",
-        sample,
-        by_number,
-        defs,
-        ask=lambda _: next(answers),
-        show=lambda s: None,
-        directory=tmp_path,
-    )
-    assert audit.load_ratings("me", tmp_path)[(2, "type: docs")] == "wrong"
-
-
 def test_adjusted_precision_ignores_unsure():
     result = audit.adjusted_precision(tp=40, fp=60, verdicts=["correct", "wrong", "unsure"])
     assert result["measured_precision"] == pytest.approx(0.4)
