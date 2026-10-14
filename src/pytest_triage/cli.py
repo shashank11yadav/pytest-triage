@@ -471,6 +471,9 @@ def cmd_audit(args: argparse.Namespace) -> None:
     from pytest_triage.classify import DEFINITIONS, make_llm_classifier
 
     _, test, memory_index = _label_setup("test")
+    if args.action.startswith("guided"):
+        _guided(args, test, memory_index)
+        return
     if args.action == "sample":
         name = f"llm:{config.LABEL_MODEL}:{config.LABEL_PROMPT}"
         fps, tp = audit.false_positives(
@@ -524,6 +527,58 @@ def cmd_audit(args: argparse.Namespace) -> None:
             result["agreed_items"] = len(both)
         save_result("audit", "labels", result | {"at": _now()})
         print(json.dumps(result, indent=2))
+
+
+def _guided(args: argparse.Namespace, test: list[dict], memory_index) -> None:
+    """The guided type-label audit (see guided.py)."""
+    from pytest_triage import audit, guided
+    from pytest_triage.classify import make_llm_classifier
+    from pytest_triage.evaluate import _now, save_result
+    from pytest_triage.github import make_client
+
+    by_number = {i["number"]: i for i in test}
+    plan = guided.load_plan()
+    if plan is None:  # first run: draw the warm-up and main samples once, seeded
+        predict = make_llm_classifier(memory_index, prompt=config.LABEL_PROMPT)
+        fps, _ = audit.false_positives(test, predict)
+        types = lambda s: {x for x in s if x.startswith("type:")}  # noqa: E731
+        tp = sum(len(types(predict(i)) & types(set(i["labels"]))) for i in test)
+        type_fps = [f for f in fps if f["label"].startswith("type:")]
+        main = guided.draw_main(type_fps, args.n)
+        meta = {
+            "predictor": f"llm:{config.LABEL_MODEL}:{config.LABEL_PROMPT}",
+            "labels": "type: only",
+            "tp": tp,
+            "fp": len(type_fps),
+            "n_issues": len(test),
+            "sample_size": len(main),
+            "seeds": {"warmup": 5, "main": 11},
+        }
+        plan = {"warmup": guided.draw_warmup(test), "main": main, "meta": meta}
+        guided.write_plan(plan["warmup"], plan["main"], meta)
+
+    if args.action == "guided":
+        token = config.github_token()
+        get_comments = guided.cached_comments(lambda: make_client(token), config.REPO)
+        guided.run_session(args.rater, plan, by_number, get_comments)
+    elif args.action == "guided-ai":
+        rater = guided.rate_with_model(plan, by_number, args.model)
+        print(f"AI rater done -> {guided.answers_path(rater, 'main')}")
+    else:
+        result = guided.score(args.rater, plan)
+        save_result("audit", f"guided type labels ({args.rater})", result | {"at": _now()})
+        m = result["main"]
+        print(
+            f"warm-up: matched maintainers on {result['warmup_matched']}/"
+            f"{result['warmup_judged']}\n"
+            f"main: {m['rated']} answered ({m['unsure']} not sure); "
+            f"{m['share_of_fps_correct']:.0%} of the disputed type labels judged correct\n"
+            f"type-label precision: measured {m['measured_precision']:.2f}, "
+            f"adjusted {m['adjusted_precision']:.2f} "
+            f"({m['adjusted_ci95'][0]:.2f}-{m['adjusted_ci95'][1]:.2f})"
+        )
+        for other, a in result["agreement"].items():
+            print(f"agreement with {other}: {a['same']}/{a['items']} (kappa {a['kappa']:.2f})")
 
 
 def cmd_report(args: argparse.Namespace) -> None:
@@ -610,10 +665,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     p = sub.add_parser("audit", help="human audit of the model's 'false positive' labels")
-    p.add_argument("action", choices=["sample", "rate", "rate-ai", "score"])
+    p.add_argument(
+        "action",
+        choices=["sample", "rate", "rate-ai", "score", "guided", "guided-ai", "guided-score"],
+        help="guided = the step-by-step type-label check for non-experts",
+    )
     p.add_argument("--model", default=config.STEP_UP, help="AI rater model (rate-ai)")
-    p.add_argument("--n", type=int, default=50, help="sample size (sample)")
-    p.add_argument("--rater", default="shashank", help="your name (rate)")
+    p.add_argument("--n", type=int, default=50, help="sample size (sample, guided)")
+    p.add_argument("--rater", default="human", help="rater name (rate, guided)")
     p.set_defaults(func=cmd_audit)
 
     sub.add_parser("report", help="write docs/index.html + print README tables").set_defaults(

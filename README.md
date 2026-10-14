@@ -453,6 +453,7 @@ uv run triage eval regress                    # dev re-run vs. the baseline (fre
 uv run triage eval slices                     # scores by issue shape (free)
 uv run triage eval selective                  # precision vs. coverage (free)
 uv run triage audit score                     # label audit
+uv run triage audit guided                    # step-by-step type-label check for a human rater
 uv run triage shadow && uv run triage shadow-score
 uv run triage report                          # rebuild docs/index.html
 ```
@@ -481,7 +482,7 @@ src/pytest_triage/
   policy.py                 routing, quarantine and the output contract
   regression.py, slices.py  regression gate; scores by issue shape
   triage.py, shadow.py      per-issue pipeline; daily shadow run and scoring
-  audit.py                  blind rating of "false positive" labels
+  audit.py, guided.py       blind rating of "false positive" labels; guided human check
   evaluate.py, report.py    evaluation runners and the results page
 tests/                      offline tests, including the regression gate
 eval/                       results, ground truth, shadow predictions and

@@ -1,4 +1,42 @@
 {
+  "guided type labels (ai-gemini-3.8-flash)": {
+    "agreement": {},
+    "at": "2026-10-14T17:03:17+00:00",
+    "main": {
+      "adjusted_ci95": [
+        0.8649588844932892,
+        0.9724544805252857
+      ],
+      "adjusted_precision": 0.936664320900774,
+      "measured_precision": 0.3793103448275862,
+      "rated": 50,
+      "share_ci95": [
+        0.7824337583502992,
+        0.9556211075129601
+      ],
+      "share_of_fps_correct": 0.8979591836734694,
+      "unsure": 1
+    },
+    "meta": {
+      "fp": 144,
+      "labels": "type: only",
+      "n_issues": 237,
+      "predictor": "llm:gemini-3.5-flash-lite:v3s",
+      "sample_size": 50,
+      "seeds": {
+        "main": 11,
+        "warmup": 5
+      },
+      "tp": 88
+    },
+    "rater": "ai-gemini-3.8-flash",
+    "warmup_ci95": [
+      0.0,
+      0.0
+    ],
+    "warmup_judged": 0,
+    "warmup_matched": 0
+  },
   "labels": {
     "agreed_items": 50,
     "at": "2026-10-12T20:59:02+00:00",
