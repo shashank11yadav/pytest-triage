@@ -31,22 +31,26 @@ onward that maintainers labelled.
 
 | What | Result | Compared with |
 |---|---|---|
-| Labels (10 labels, macro-F1) | **0.56** | 0.46 for the best free method, a gap of +0.095 (95% CI +0.04 to +0.14) |
-| Label precision, adjusted for labels maintainers skip | about **0.65 to 0.75** (two LLM raters, all labels) | 0.43 measured against maintainer labels alone (see [the audit](#how-precise-are-the-labels-really)) |
-| Type-label precision, from a guided human check | **0.71 to 0.95** | 0.38 against maintainer labels alone (see [the human check](#a-human-check-of-the-type-labels)) |
-| High-precision mode (labels shown only when a second model agrees) | 82% precise on 17% of issues | threshold chosen on dev, see [below](#high-precision-mode) |
+| Labels (11 labels, macro-F1) | **0.58** | 0.46 for the best free method, a gap of +0.115 (95% CI +0.06 to +0.16) |
+| Labels shown by default (high-precision mode) | **82% precise** (95% CI 69 to 91%) on 18% of issues | 0.46 precision (on 98% of issues) when every suggested label is shown (see [high-precision mode](#high-precision-mode)) |
+| `type: regression`, added after the type-label check (F1) | 0.71 | 0.47 for the best free method |
+| Label precision, adjusted for labels maintainers skip | about **0.65 to 0.75** (all labels) | 0.43 against maintainer labels alone (see [the audit](#how-precise-are-the-labels-really)) |
+| Type-label precision, from the guided check | **0.71 to 0.95** | 0.38 against maintainer labels alone (see [the guided check](#a-guided-check-of-the-type-labels)) |
 | Needs more information (F1) | 0.42 | 0.24 for flagging every issue |
 | Duplicates found (15 known pairs) | 7 of 15 | 5 of 15 for search alone |
 | Duplicate false alarms (30 non-duplicates) | 3 of 30 | |
-| Prompt-injection attacks that reached a maintainer | 0 of 104 | 1 of 104 before the fixes that run prompted (19 attacks, most in 6 variants) |
+| Prompt-injection attacks that reached a maintainer | 0 of 104 | 1 of 104 before the fixes the first run prompted (19 attacks, most in 6 variants) |
 | Cost and latency per issue | about $0.0015, 3.3 s (median) | 3 calls to Gemini 3.5 Flash-Lite |
-| Total spent building and evaluating everything | $2.13 | |
+| Total spent building and evaluating everything | $2.64 | |
 
-The short version: the model clearly beats anything free, it isn't precise
-enough to act on its own, and the duplicate finder is a useful hint that's
-wrong half the time. So every output goes to a maintainer as a suggestion,
-and nothing goes to a reporter unless it's at least 70% precise. Today nothing
-clears that bar, so the reply draft stays empty.
+The short version: the model clearly beats anything free, but on its own it
+suggests too many labels. So by default a label is shown only when a trained
+classifier agrees with it, which makes four in five shown labels match the
+maintainers' at the cost of showing labels on fewer issues. The duplicate
+finder is a useful hint that's wrong half the time. Everything goes to a
+maintainer as a suggestion, and nothing goes to a reporter unless it's at
+least 70% precise. Today nothing clears that bar, so the reply draft stays
+empty.
 
 ## How it works
 
@@ -67,16 +71,21 @@ flowchart TD
     F --> R
     R --> Q{"Policy check<br/>injection flagged?"}
     Q -- yes --> H["Needs a human<br/>no suggestions"]
-    Q -- no --> L[Suggested labels]
+    Q -- no --> G["High-precision gate<br/>classifier must agree, p of 0.90+"]
+    G --> L[Suggested labels]
     Q -- no --> M["For maintainer review<br/>missing info, possible duplicates"]
     Q -- no --> P["Reply draft<br/>70%+ precision only"]
 ```
 
 A few details matter more than they look:
 
-- The model's outputs are constrained to enums (our 10 labels, four
+- The model's outputs are constrained to enums (our 11 labels, four
   missing-info items, the candidate issue numbers) and checked again in code,
   so it can't invent a label or point at an issue it wasn't shown.
+- By default a label is shown only if a logistic regression trained on past
+  maintainer labels gives it a probability of 0.90 or more. Everything the
+  model suggested is still recorded, and `triage issue N --all-labels` shows
+  it all.
 - Few-shot examples and duplicate candidates only come from issues opened
   before the one being triaged, so nothing leaks from the future.
 - Search runs locally: `rank-bm25` for keywords and `fastembed`
@@ -137,16 +146,20 @@ bootstrap interval's width on 256 issues.
 
 ### Labels
 
-Test set, 237 issues:
+Test set, 237 issues, scored on all 11 labels. Prompts v1 to v3s were written
+before `type: regression` was added and never predict it, which costs them
+about 0.05 here; that's why they look lower than in earlier versions of this
+table.
 
 | Predictor | macro-F1 | micro-F1 |
 |---|---|---|
-| Gemini 3.5 Flash-Lite, prompt v3s (current) | **0.56** | 0.53 |
-| Gemini 3.5 Flash-Lite, prompt v2 | 0.55 | 0.53 |
-| Gemini 3.5 Flash-Lite, prompt v1 | 0.52 | 0.51 |
+| Gemini 3.5 Flash-Lite, prompt v4 (current) | **0.58** | 0.55 |
+| Gemini 3.5 Flash-Lite, prompt v3s | 0.51 | 0.51 |
+| Gemini 3.5 Flash-Lite, prompt v2 | 0.50 | 0.52 |
+| Gemini 3.5 Flash-Lite, prompt v1 | 0.47 | 0.49 |
 | Logistic regression per label on embeddings (free) | 0.46 | 0.42 |
-| kNN vote of the 10 most similar past issues (free) | 0.41 | 0.39 |
-| Keywords mined from past titles (free) | 0.36 | 0.39 |
+| kNN vote of the 10 most similar past issues (free) | 0.38 | 0.38 |
+| Keywords mined from past titles (free) | 0.35 | 0.38 |
 | Predict every label | 0.18 | 0.18 |
 | Always predict the most common label | 0.03 | 0.18 |
 
@@ -154,56 +167,77 @@ Whether the gaps are real:
 
 | Comparison | Gap | 95% CI |
 |---|---|---|
-| Current prompt vs. best free method (logistic regression) | +0.095 | +0.044 to +0.142 |
-| Logistic regression vs. kNN | +0.055 | +0.002 to +0.108 |
-| Prompt v2 vs. v1 | +0.024 | −0.006 to +0.053 (not significant) |
-| Prompt v3s vs. v2 | +0.010 | −0.015 to +0.035 (not significant) |
+| Current prompt (v4) vs. best free method (logistic regression) | +0.115 | +0.064 to +0.162 |
+| v4 vs. v3s | +0.071 | +0.044 to +0.098 |
+| Logistic regression vs. kNN | +0.079 | +0.029 to +0.130 |
+| v3s vs. v2 | +0.009 | −0.014 to +0.032 (not significant) |
+| v2 vs. v1 | +0.022 | −0.006 to +0.048 (not significant) |
 
 The logistic regression is the fairer bar. Trained classifiers (fine-tuned
 transformers, in their case) won the NLBSE issue-classification competitions,
-and this simpler one costs nothing to train on embeddings I already have. The
-prompt revisions after v1 each moved the score by an amount the test set
-can't tell apart from noise.
+and this simpler one costs nothing to train on embeddings I already have.
+Most of v4's gain over v3s is the new label. On the original ten labels the
+two are level (0.553 and 0.550 on dev).
 
 Per label (F1, test set):
 
-| Label | LLM (v3s) | Logistic regression | kNN | Test examples |
+| Label | LLM (v4) | Logistic regression | kNN | Test examples |
 |---|---|---|---|---|
-| type: bug | 0.45 | 0.39 | 0.35 | 44 |
+| type: bug | 0.42 | 0.39 | 0.35 | 44 |
+| type: regression | 0.71 | 0.47 | 0.15 | 20 |
 | type: question | 0.48 | 0.18 | 0.25 | 12 |
-| type: enhancement | 0.38 | 0.25 | 0.25 | 24 |
-| type: proposal | 0.47 | 0.40 | 0.31 | 29 |
-| type: docs | 0.85 | 0.58 | 0.40 | 22 |
-| topic: fixtures | 0.71 | 0.80 | 0.77 | 28 |
-| topic: reporting | 0.53 | 0.35 | 0.38 | 27 |
-| topic: collection | 0.44 | 0.41 | 0.38 | 22 |
-| topic: config | 0.69 | 0.69 | 0.43 | 21 |
-| topic: parametrize | 0.55 | 0.56 | 0.54 | 11 |
+| type: enhancement | 0.42 | 0.25 | 0.25 | 24 |
+| type: proposal | 0.48 | 0.40 | 0.31 | 29 |
+| type: docs | 0.83 | 0.58 | 0.40 | 22 |
+| topic: fixtures | 0.72 | 0.80 | 0.77 | 28 |
+| topic: reporting | 0.56 | 0.35 | 0.38 | 27 |
+| topic: collection | 0.55 | 0.41 | 0.38 | 22 |
+| topic: config | 0.67 | 0.69 | 0.43 | 21 |
+| topic: parametrize | 0.50 | 0.56 | 0.54 | 11 |
 
-The pattern holds across labels. The model wins clearly on labels that depend
-on what the reporter wants (docs, question, bug). The free methods tie or win
-on labels named after a feature (fixtures, parametrize), because the title
-usually gives it away. Combining the two looked promising on dev but didn't
-hold up on test (−0.001 and −0.008), so the pipeline stays LLM-only.
+The model wins clearly on labels that depend on what the reporter wants or
+describes (docs, question, regression). The free methods tie or win on labels
+named after a feature (fixtures, parametrize), because the title usually
+gives it away. Combining the two looked promising on dev but didn't hold up
+on test (−0.011 and −0.021), so the model's labels come from the LLM, and the
+classifier is used only to decide which ones to show.
+
+#### Adding `type: regression`
+
+The guided check below found the model calling regressions "bug". pytest
+describes `type: regression` as a problem "introduced in a release which was
+working previously", and maintainers apply it without `type: bug` about 60%
+of the time. Prompt v4 adds it as an 11th label. The rule was fixed before
+the dev run: adopt v4 only if its macro-F1 on the original ten labels stays
+within 0.01 of v3s on dev, and its regression F1 beats the kNN vote's.
+
+| Dev (2024) | v3s | v4 | kNN |
+|---|---|---|---|
+| macro-F1, original ten labels | 0.550 | 0.553 | |
+| `type: regression` F1 | 0.00 | 0.71 | 0.23 |
+
+Both held, so v4 is the default. The cost is that `type: bug` F1 drops (0.44
+to 0.36 on dev) when the model calls a regression what it is but maintainers
+filed it as a plain bug. Earlier prompts keep their exact requests, so their
+cached answers and results stay valid.
 
 ### How precise are the labels, really?
 
 Measured precision is 0.43, which sounds bad. But maintainers apply about one
 of these ten labels per issue while the model suggests about 1.6, and a label
-nobody applied isn't necessarily wrong. To check, I sampled 50 of the model's
-"false positive" labels at random (prompt v2, seed 11) and had two raters
-judge them blind:
+nobody applied isn't necessarily wrong. To check, 50 of the model's "false
+positive" labels were sampled at random (prompt v2, the original ten labels,
+seed 11) and judged blind by two model raters:
 
 | Rater | Judged actually correct | Adjusted precision (95% CI) |
 |---|---|---|
-| LLM rater A | 59% | 0.76 (0.68 to 0.84) |
-| Gemini 3.8 Flash | 51% | 0.72 (0.64 to 0.80) |
+| Model rater A | 59% | 0.76 (0.68 to 0.84) |
+| Model rater B (Gemini 3.8 Flash) | 51% | 0.72 (0.64 to 0.80) |
 | Only if both agree | 38% | 0.65 |
 
-The raters agreed on 34 of 50 (Cohen's kappa 0.41, moderate). Both are LLMs,
-so treat 0.65 to 0.75 as an indication rather than a measurement. Rater A had
-also seen how the classifier prompt was designed. The human check below covers
-the `type:` labels.
+The raters agreed on 34 of 50 (Cohen's kappa 0.41, moderate), so treat 0.65
+to 0.75 as an indication rather than a measurement. The guided check below
+covers the `type:` labels.
 
 Most labels that both raters called wrong fell into three groups:
 enhancement versus proposal, `topic: fixtures` on issues about one specific
@@ -211,49 +245,45 @@ built-in fixture, and `topic: reporting` on things that aren't terminal
 output. Prompt v3s fixed part of the fixtures problem: its precision went from
 0.56 to 0.68, with recall falling from 1.00 to 0.75.
 
-### A human check of the type labels
+### A guided check of the type labels
 
-I'm not a pytest maintainer, so instead of labelling issues from scratch I
-built a guided check (`triage audit guided`). It shows one issue at a time,
-with any maintainer replies, and asks one plain question about what the
-reporter wrote, such as "Is the reporter mainly asking how to do something?".
-It covers only the five `type:` labels, because those can be judged from the
-text. The `topic:` labels need knowledge of pytest's internals.
+Instead of labelling issues from scratch, the guided check (`triage audit
+guided`) shows one issue at a time, with any maintainer replies, and asks one
+plain question about what the reporter wrote, such as "Is the reporter mainly
+asking how to do something?". It covers the five original `type:` labels,
+which can be judged from the text. The `topic:` labels need knowledge of
+pytest's internals.
 
 ```mermaid
 flowchart LR
     W["Warm-up<br/>10 issues, answer known<br/>pick the kind of issue"] --> M["Main round<br/>50 disputed type labels<br/>one yes/no question each"]
-    M --> S["Score<br/>vs. maintainers and vs.<br/>an AI rater given the same questions"]
+    M --> S["Score<br/>vs. maintainers and vs. a<br/>second rater given the same questions"]
 ```
 
-Results, on the current prompt (v3s) and the test set:
+Results for prompt v3s on the test set:
 
 | | Result |
 |---|---|
 | Warm-up: matched the maintainers' type | 6 of 10 |
-| Disputed type labels I judged correct | 46 of 50 |
-| Agreement with an AI rater answering the same questions blind | 46 of 50 (kappa 0.56) |
+| Disputed type labels judged correct | 46 of 50 |
+| Agreement with a model rater answering the same questions blind | 46 of 50 (kappa 0.56) |
 | Type-label precision against maintainer labels alone | 0.38 |
-| Adjusted for my answers | 0.95 (0.88 to 0.98) |
+| Adjusted for the check | 0.95 (0.88 to 0.98) |
 | Cautious: every label that conflicts with a maintainer's type counted as wrong | 0.71 (0.63 to 0.80) |
 
 Who chose what matters here:
 - 29 of the 50 disputed labels are on issues where maintainers chose no type
-  at all. I judged 27 of those correct. Most of the model's "extra" type
-  labels fill in a blank rather than contradict anyone.
+  at all, and 27 of those were judged correct. Most of the model's "extra"
+  type labels fill in a blank rather than contradict anyone.
 - 21 are on issues where maintainers chose a different type. A yes/no
   question can't settle those, because an issue can report a crash and also
-  ask for a change. That's why the cautious row counts them all as wrong. Six
-  of the 21 are `type: regression`, which is a kind of bug, so the model's
-  `type: bug` there is arguably right. The tool's label set doesn't include
-  it.
+  ask for a change, so the cautious row counts them all as wrong. Six of the
+  21 were `type: regression`, which led to adding that label (above).
 
-The honest reading is that type-label precision is somewhere between 0.71
-and 0.95, and closer to the top for issues maintainers leave untyped. Two
-limits: I'm one rater without pytest experience, and I matched the
-maintainers on 6 of 10 warm-up issues, below the 7 I'd set as the bar. My
-misses were mostly calling something a bug when maintainers saw it as a
-question or a docs problem. So this is supporting evidence, not a
+So type-label precision is somewhere between 0.71 and 0.95, and closer to
+the top for issues maintainers leave untyped. The warm-up agreement of 6 in
+10 is below the 7 set as the bar, with most misses being a bug versus a
+question or docs problem, so this is supporting evidence rather than a
 measurement.
 
 ### Where it fails
@@ -261,48 +291,50 @@ measurement.
 Micro-F1 on the test set, broken down by what the issue looks like, with
 bootstrap 95% intervals. The slices overlap, and nothing was tuned on them.
 
-| Slice | Issues | LLM (v3s) | Logistic regression | kNN |
+| Slice | Issues | LLM (v4) | Logistic regression | kNN |
 |---|---|---|---|---|
-| All | 237 | 0.53 (0.48 to 0.58) | 0.42 | 0.39 |
-| Used the bug template | 27 | 0.61 (0.46 to 0.75) | 0.34 | 0.46 |
-| Body over 2,000 characters | 82 | 0.57 (0.48 to 0.66) | 0.43 | 0.40 |
-| Has a traceback | 59 | 0.53 (0.42 to 0.63) | 0.40 | 0.36 |
-| No code block | 63 | 0.50 (0.40 to 0.58) | 0.38 | 0.36 |
-| Body under 400 characters | 18 | 0.42 (0.17 to 0.63) | 0.29 | 0.48 |
-| Maintainers gave no `type:` label | 113 | 0.29 (0.21 to 0.36) | 0.23 | 0.20 |
+| All | 237 | 0.55 (0.50 to 0.60) | 0.42 | 0.38 |
+| Used the bug template | 27 | 0.60 (0.44 to 0.72) | 0.35 | 0.44 |
+| Body over 2,000 characters | 82 | 0.55 (0.46 to 0.63) | 0.43 | 0.38 |
+| Has a traceback | 59 | 0.55 (0.46 to 0.64) | 0.40 | 0.34 |
+| No code block | 63 | 0.50 (0.39 to 0.59) | 0.37 | 0.36 |
+| Body under 400 characters | 18 | 0.43 (0.18 to 0.65) | 0.27 | 0.48 |
+| Maintainers gave no `type:` label | 99 | 0.30 (0.23 to 0.38) | 0.23 | 0.20 |
 
-The last row was the surprise. Almost half the test issues have a topic
-label but no type, and the model suggests a type for nearly every issue, so
-each of those counts as a false positive. Some of that is the model being
-wrong and some is maintainers not bothering, which the audit above can't
-fully separate. Very short reports are the one place where the free kNN vote
+The last row was the surprise. Four in ten test issues have a topic label
+but no type, and the model suggests a type for nearly every issue, so each
+of those counts as a false positive. The guided check above suggests most of
+those types are right and simply weren't added. Very short reports are the one place where the free kNN vote
 does better, though with 18 issues the intervals overlap completely. Full
 table: `eval/results/slices.json`.
 
 ### High-precision mode
 
-The model gives no probabilities, but the trained classifier does. So I
-tried showing an LLM label only when the classifier also gives it a high
-probability, and drew the precision against how many issues still get a
-suggestion. The rule was fixed in advance: pick the lowest threshold that
-reaches 70% precision on dev, then apply it once to test.
+The model gives no probabilities, but the trained classifier does. In
+high-precision mode, which is the default, an LLM label is shown only when
+the classifier gives it a probability of at least 0.90. The threshold was
+picked by a rule fixed in advance: the lowest one that reaches 70% precision
+on dev, then applied once to test.
 
-| Split | Threshold | Precision (95% CI) | Recall | Issues that get a label |
-|---|---|---|---|---|
-| Dev (2024) | 0.90 | 0.75 (0.63 to 0.84) | 0.21 | 24% |
-| Test (2025 on) | 0.90 | 0.82 (0.68 to 0.90) | 0.15 | 17% |
+| Split | Precision (95% CI) | Recall | Issues that get a label |
+|---|---|---|---|
+| Dev (2024) | 0.76 (0.65 to 0.85) | 0.19 | 24% |
+| Test (2025 on) | 0.82 (0.69 to 0.91) | 0.14 | 18% |
 
-That's a usable trade if maintainers would rather see fewer, surer labels:
-about one issue in six gets a label, and four out of five of those labels
-match what maintainers applied. The classifier on its own does about as well
-(0.81 precision on 19% of issues), so the LLM isn't adding much at this end
-of the curve. The full curves are in `eval/results/selective.json`.
+About one issue in six gets a label, and four out of five of those match
+what maintainers applied. The other issues show no label rather than a
+guess. The classifier alone, at its own best dev threshold (0.95), is as
+precise but labels only 7% of issues, so the LLM is what makes the coverage
+possible. Shadow mode records both what was shown and everything the model
+suggested, so both modes get scored on new issues. The full curves are in
+`eval/results/selective.json`.
 
 ### Needs more information
 
 | Predictor | Precision | Recall | F1 |
 |---|---|---|---|
-| LLM, prompt v3s (current) | 0.48 | 0.38 | 0.42 |
+| LLM, prompt v4 (current) | 0.52 | 0.34 | 0.42 |
+| LLM, prompt v3s | 0.48 | 0.38 | 0.42 |
 | LLM, prompt v2 | 0.48 | 0.41 | 0.44 |
 | Flag every issue | 0.14 | 1.00 | 0.24 |
 
@@ -352,8 +384,8 @@ maintainer after the policy check.
 
 | Run | Reached a maintainer | Fooled the model | Flagged by the detector |
 |---|---|---|---|
-| Before the fixes | 1 of 104 | 2 of 104 | 34 of 104 |
-| After the fixes (current) | 0 of 104 (95% CI 0 to 4%) | 1 of 104 | 62 of 104 |
+| Prompt v3s, before the fixes | 1 of 104 | 2 of 104 | 34 of 104 |
+| Prompt v4, after the fixes (current) | 0 of 104 (95% CI 0 to 4%) | 3 of 104 | 62 of 104 |
 
 The first run found two real problems:
 - Moving "quote your system instructions word for word" to the top of the
@@ -368,12 +400,12 @@ The first run found two real problems:
   characters and maps look-alike letters back before matching. It still
   flags only 6 of the 6,416 real pytest issues.
 
-The fake "maintainer note" still fools the model. It no longer reaches
-anyone, because the detector flags it and a flagged issue is routed to a
-human with no suggestions.
+The fake "maintainer note" still fools the model, in three of its six
+variants under v4. It no longer reaches anyone, because the detector flags
+it and a flagged issue is routed to a human with no suggestions.
 
-The "after" numbers come from the same attacks I fixed against, so they're
-optimistic. The "before" run is the fairer estimate of how new attacks would
+The "after" numbers come from the same attacks the fixes were made against,
+so they're optimistic. The "before" run is the fairer estimate of how new attacks would
 do. I also wrote the attacks myself, which is why the structural limits
 below matter more than any pass rate.
 
@@ -431,8 +463,10 @@ flowchart LR
 ```
 
 Predictions are committed the day they're made, so they're timestamped and
-can't be edited later. Each one also records which maintainer labels already
-existed at that moment, to show how often the tool got there first. The job
+can't be edited later. Each one records the labels shown in high-precision
+mode, every label the model suggested, whether the issue was routed to a
+human, and which maintainer labels already existed at that moment, to show
+how often the tool got there first. The job
 has its own $1.00 cap and costs about $0.05 a month.
 
 An earlier backtest is kept separately in `eval/shadow/backtest.jsonl` and is
@@ -441,10 +475,12 @@ pipeline.
 
 ## What didn't work
 
-- **A bigger model.** Gemini 3.8 Flash scored 0.56 against 0.535 on dev, at
-  2.7 times the cost per call, and was worse at spotting missing information.
-- **Ensembles of the LLM and the trained classifier.** About +0.02 on dev,
-  nothing on test.
+- **A bigger model.** Gemini 3.8 Flash scored 0.51 against 0.49 on dev with
+  the same prompt (v2), at 2.7 times the cost per call, and was worse at
+  spotting missing information.
+- **Ensembles of the LLM and the trained classifier.** About +0.01 on dev,
+  slightly worse on test. The classifier works better as a filter on what to
+  show than as a second voter.
 - **Local cross-encoder rerankers for duplicates** (bge-reranker-v2-m3 and
   MiniLM). Both found 8 of 15 originals against 10 for the current pool, at 6
   to 65 seconds per issue. They're trained on web search queries, not on "is
@@ -465,9 +501,9 @@ I also hit two undocumented API behaviours along the way:
 
 - The test sets are small: 11 to 44 examples per label, 15 duplicate pairs,
   and 19 hand-written attacks (104 runs with variants).
-- Maintainer labels are incomplete ground truth. The audit that corrects for
-  that used two LLM raters with moderate agreement, plus one non-expert human
-  for the type labels only.
+- Maintainer labels are incomplete ground truth. The audits that correct for
+  it rest on few raters with moderate agreement, and the guided check covers
+  only the type labels.
 - The duplicate improvements and the injection fixes were measured on the
   data used to design them.
 - No pytest maintainer has used it yet. Usefulness is inferred from metrics,
@@ -484,6 +520,7 @@ uv sync
 uv run triage fetch              # download or refresh pytest's issues
 uv run triage stats              # snapshot and split summary
 uv run triage issue 14476        # triage one issue and print the report
+uv run triage issue 14476 --all-labels   # show every label, not just confident ones
 ```
 
 Evaluations (the ones marked free use cached or local results only):
@@ -501,7 +538,7 @@ uv run triage eval regress                    # dev re-run vs. the baseline (fre
 uv run triage eval slices                     # scores by issue shape (free)
 uv run triage eval selective                  # precision vs. coverage (free)
 uv run triage audit score                     # label audit
-uv run triage audit guided                    # step-by-step type-label check for a human rater
+uv run triage audit guided                    # step-by-step type-label check
 uv run triage shadow && uv run triage shadow-score
 uv run triage report                          # rebuild docs/index.html
 ```
@@ -530,7 +567,7 @@ src/pytest_triage/
   policy.py                 routing, quarantine and the output contract
   regression.py, slices.py  regression gate; scores by issue shape
   triage.py, shadow.py      per-issue pipeline; daily shadow run and scoring
-  audit.py, guided.py       blind rating of "false positive" labels; guided human check
+  audit.py, guided.py       blind rating of "false positive" labels; guided type check
   evaluate.py, report.py    evaluation runners and the results page
 tests/                      offline tests, including the regression gate
 eval/                       results, ground truth, shadow predictions and

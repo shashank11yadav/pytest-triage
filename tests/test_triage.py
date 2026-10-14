@@ -69,3 +69,24 @@ def test_clean_issue_gets_suggestions(monkeypatch):
     monkeypatch.setattr(triage.llm, "spent", lambda: 0.0)
     out = triage.triage_issue(issue, index, index)
     assert out["route"] == "suggest" and out["labels"] == ["type: bug"]
+
+
+def test_high_precision_mode_shows_only_confident_labels(monkeypatch):
+    issue = {"number": 9, "title": "crash", "body": "it crashes", "created_at": "2026-01-01"}
+    index = IssueIndex([issue | {"labels": []}], np.array([[1.0, 0.0]], dtype=np.float32))
+    monkeypatch.setattr(
+        triage, "assess", lambda *a, **k: {"labels": {"type: bug", "topic: config"}, "missing": []}
+    )
+    monkeypatch.setattr(
+        triage,
+        "find_duplicates",
+        lambda *a, **k: {"duplicates": [], "verdicts": [], "candidates": [], "queries": []},
+    )
+    monkeypatch.setattr(triage.llm, "spent", lambda: 0.0)
+    probs = {label: 0.1 for label in triage.config.LABELS} | {"type: bug": 0.95}
+    out = triage.triage_issue(issue, index, index, confidence=lambda i: probs, min_confidence=0.9)
+    assert out["labels"] == ["type: bug"]
+    assert out["labels_all"] == ["topic: config", "type: bug"]
+    assert out["high_precision"]
+    off = triage.triage_issue(issue, index, index, confidence=lambda i: probs, min_confidence=None)
+    assert off["labels"] == ["topic: config", "type: bug"] and not off["high_precision"]

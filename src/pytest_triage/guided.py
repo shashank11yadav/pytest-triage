@@ -1,14 +1,14 @@
-"""Guided human audit of `type:` labels, for a rater who doesn't know pytest.
+"""Guided audit of `type:` labels, answerable without knowing pytest's internals.
 
 The rater is never asked to "label the issue". They answer one plain question
 about what the reporter wrote, e.g. "Is the reporter mainly asking how to do
-something?". Only the five `type:` labels are audited: they can be judged from
+something?". Only the five original `type:` labels are audited: they can be judged from
 the text, while `topic:` labels need knowledge of pytest's internals.
 
     warm-up  10 issues whose type maintainers already chose (seeded).
              The rater picks the kind, then sees the maintainers' answer. Their
              agreement says how far to trust the main round.
-    main     50 `type:` labels the current classifier suggested and maintainers
+    main     50 `type:` labels the v3s classifier suggested and maintainers
              didn't apply (test split, seeded). Yes / no / not sure for each.
 
 Files under eval/audit/guided/ hold issue numbers, labels and answers only.
@@ -43,7 +43,7 @@ QUESTIONS = {
 }
 
 # Warm-up choices. Enhancement and proposal are merged: the line between them is a
-# maintainer judgement call, not something a newcomer can read off the text.
+# maintainer judgement call, not something that can be read off the text.
 KINDS = {
     "1": ("a bug report", {"type: bug"}),
     "2": ("a how-to question", {"type: question"}),
@@ -331,8 +331,8 @@ GUIDED_SCHEMA = {
 
 
 def rate_with_model(plan: dict, by_number: dict[int, dict], model: str) -> str:
-    """An AI rater given exactly what the human gets: the same question and the issue
-    text, no maintainer labels, no other rater's answers."""
+    """A model rater given exactly what the guided session shows: the same question and
+    the issue text, no maintainer labels, no other rater's answers."""
     from pytest_triage.guard import clean_for_prompt
     from pytest_triage.llm import BadOutput, generate_json, json_body
 

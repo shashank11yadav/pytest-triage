@@ -40,3 +40,13 @@ def test_score_counts_untriaged_and_scores_only_triaged():
 
 def test_predictions_for_unknown_issues_are_ignored():
     assert score_shadow([prediction(99)], [issue(1)])["predicted"] == 0
+
+
+def test_shadow_scores_shown_and_all_labels_separately():
+    preds = [prediction(1, ["type: bug"]) | {"labels_all": ["type: bug", "topic: config"]}]
+    preds.append(prediction(2, []) | {"labels_all": ["type: docs"]})
+    issues = [issue(1, ["type: bug"]), issue(2, ["type: docs"])]
+    result = score_shadow(preds, issues)
+    assert result["issues_with_a_shown_label"] == 1
+    assert result["labels_all"]["labels"]["type: docs"]["f1"] == 1.0
+    assert result["labels"]["labels"]["type: docs"]["f1"] == 0.0

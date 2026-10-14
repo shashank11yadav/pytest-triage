@@ -30,14 +30,17 @@ SHADOW = EVAL / "shadow"
 SPLIT_DATE = "2025-01-01"  # created before -> memory, on/after -> test
 DEV_DATE = "2024-01-01"  # memory issues from here to SPLIT_DATE = dev set for choosing variants
 
-# Top 5 `type:` + top 5 `topic:` labels by count (snapshot of 2026-10-08).
-# Each has 173+ memory examples; rarer labels are too thin to learn or score.
+# Top 5 `type:` + top 5 `topic:` labels by count (snapshot of 2026-10-08), plus
+# `type: regression` (added 2026-10-14: the type-label check found the model calling
+# regressions "bug"; 171 memory examples). Prompts v1-v3s predate it and only ever
+# predict the first ten (classify.ORIGINAL_LABELS); all scoring uses all eleven.
 LABELS = (
     "type: bug",
     "type: question",
     "type: enhancement",
     "type: proposal",
     "type: docs",
+    "type: regression",
     "topic: fixtures",
     "topic: reporting",
     "topic: collection",
@@ -73,7 +76,7 @@ PRICES = {
 # attacks landed): dev 0.55 vs 0.535, attacks 1/19 vs 2/19. Test: +0.010 vs v2
 # (CI -0.015..+0.035, not significant); needs-info F1 0.42 vs 0.44.
 LABEL_MODEL = WORKHORSE
-LABEL_PROMPT = "v3s"
+LABEL_PROMPT = "v4"  # adopted 2026-10-14 by the rule in classify.py (dev results there)
 DEDUPE_MODEL = WORKHORSE
 
 # Lowest thinking level each model accepts (3.8-flash rejects "minimal" with a 400,
@@ -88,6 +91,10 @@ THINKING_HEADROOM = {WORKHORSE: 0, STEP_UP: 1024}
 # needs-info precision 0.48; duplicate flags 0.50 with the union candidate pool
 # (0.36 before) - so today no reply is drafted.
 REPLY_MIN_PRECISION = 0.70
+# High-precision mode (on by default): a label is shown only if the trained classifier
+# gives it at least this probability. Chosen on dev by `triage eval selective` as the
+# lowest threshold reaching REPLY_MIN_PRECISION. None turns the gate off.
+LABEL_MIN_CONFIDENCE: float | None = 0.90
 MEASURED_PRECISION = {"missing": 0.48, "duplicates": 0.50}
 
 # Whole project; calls past this are refused, not made. The scheduled shadow job sets

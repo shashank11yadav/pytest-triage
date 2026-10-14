@@ -17,14 +17,28 @@ def issue(number, title, labels=(), body="body", created_at="2020-01-01"):
     }
 
 
-def test_every_label_has_a_definition_in_the_prompt():
-    assert set(classify.DEFINITIONS) == set(LABELS)
-    for label in LABELS:
-        assert label in classify.SYSTEM
+def test_every_label_a_prompt_predicts_is_defined_in_it():
+    for name, labels in classify.PROMPT_LABELS.items():
+        for label in labels:
+            assert label in classify.PROMPTS[name], (name, label)
 
 
-def test_schema_constrains_output_to_our_labels():
-    assert classify.SCHEMA["properties"]["labels"]["items"]["enum"] == list(LABELS)
+def test_schema_constrains_output_to_each_prompts_labels():
+    def enum(prompt):
+        body = classify.assess_body(issue(9, "t"), [], "gemini-3.5-flash-lite", prompt)
+        return body["response_format"]["schema"]["properties"]["labels"]["items"]["enum"]
+
+    assert enum("v4") == list(LABELS)
+    assert "type: regression" not in enum("v3s")  # earlier prompts keep their exact request
+    assert len(enum("v3s")) == len(LABELS) - 1
+
+
+def test_examples_show_regression_only_to_prompts_that_know_it():
+    example = issue(1, "broke after upgrade", labels=["type: regression", "type: bug"])
+    old = classify.build_prompt(issue(9, "t"), [example])
+    new = classify.build_prompt(issue(9, "t"), [example], labels=LABELS)
+    assert "Labels: ['type: bug']" in old
+    assert "Labels: ['type: bug', 'type: regression']" in new
 
 
 def test_prompt_fences_issue_and_shows_example_labels():

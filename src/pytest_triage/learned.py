@@ -12,6 +12,8 @@ Protocol (no decision ever looks at the test split):
     final test run            fit < 2024, tune on 2024, score 2025+ (test)
 """
 
+from collections.abc import Callable
+
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 
@@ -145,3 +147,26 @@ def combine(
         else:
             raise ValueError(f"unknown variant part {part!r}")
     return out
+
+
+def make_confidence(labelled: list[dict], vector_of: Callable[[int], np.ndarray]):
+    """issue -> {label: probability} for live triage. Fit on labelled issues before
+    SPLIT_DATE, C and thresholds tuned on the ones after; only the probabilities are
+    used here (by the high-precision gate), not the per-label thresholds."""
+    from pytest_triage.config import SPLIT_DATE
+    from pytest_triage.dataset import split
+
+    fit, tune = split(labelled, date=SPLIT_DATE)
+    vec = lambda issues: np.array([vector_of(i["number"]) for i in issues])  # noqa: E731
+    model = train(fit, vec(fit), tune, vec(tune))
+
+    def confidence(issue: dict) -> dict[str, float]:
+        p = model.proba(vector_of(issue["number"])[None, :])[0]
+        return dict(zip(LABELS, p.tolist(), strict=True))
+
+    return confidence
+
+
+def gate(labels: set[str], probs: dict[str, float], threshold: float) -> set[str]:
+    """High-precision mode: keep a label only if the classifier agrees with it."""
+    return {label for label in labels if probs[label] >= threshold}

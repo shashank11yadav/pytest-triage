@@ -116,6 +116,7 @@ def cmd_eval_significance(args: argparse.Namespace) -> None:
     vec = lambda issues: np.array([vectors[i["number"]] for i in issues])  # noqa: E731
     model = learned.train(fit, vec(fit), tune, vec(tune))
     predictors = {
+        "llm v4": make_llm_classifier(memory_index, prompt="v4"),
         "llm v3s": make_llm_classifier(memory_index, prompt="v3s"),
         "llm v2": make_llm_classifier(memory_index, prompt="v2"),
         "llm v1": make_llm_classifier(memory_index, prompt="v1"),
@@ -125,6 +126,8 @@ def cmd_eval_significance(args: argparse.Namespace) -> None:
     preds = {k: [f(i) for i in test] for k, f in predictors.items()}
     truth = [targets(i) for i in test]
     for a, b in (
+        ("llm v4", "logreg"),
+        ("llm v4", "llm v3s"),
         ("llm v3s", "logreg"),
         ("llm v3s", "llm v2"),
         ("llm v2", "logreg"),
@@ -204,13 +207,14 @@ def cmd_eval_learned(args: argparse.Namespace) -> None:
         truth = [targets(i) for i in scored]
         llm_p = [llm(i) for i in scored]
         knn = baselines.make_knn(IssueIndex.build(memory))
+        current = f"llm {config.LABEL_PROMPT}"
         pairs = {
             "logreg vs knn": ([logreg(i) for i in scored], [knn(i) for i in scored]),
-            "llm v2 vs logreg": (llm_p, [logreg(i) for i in scored]),
+            f"{current} vs logreg": (llm_p, [logreg(i) for i in scored]),
         }
         for name, predict in predictors.items():
             if name.startswith("ensemble"):
-                pairs[f"{name} vs llm v2"] = ([predict(i) for i in scored], llm_p)
+                pairs[f"{name} vs {current}"] = ([predict(i) for i in scored], llm_p)
         for name, (a, b) in pairs.items():
             r = bootstrap_diff(truth, a, b)
             save_result("significance", name, r | {"n": len(scored), "at": _now()})
@@ -387,6 +391,15 @@ def _live_indexes():
     )
 
 
+def _live_confidence(index, labelled):
+    """The high-precision gate's classifier, or None when the gate is off."""
+    if config.LABEL_MIN_CONFIDENCE is None:
+        return None
+    from pytest_triage.learned import make_confidence
+
+    return make_confidence(labelled.issues, lambda n: index.vectors[index.position[n]])
+
+
 def cmd_eval_attacks(args: argparse.Namespace) -> None:
     from pytest_triage.attacks import MUTATIONS, run_attacks
     from pytest_triage.evaluate import _now, save_result
@@ -418,12 +431,16 @@ def cmd_issue(args: argparse.Namespace) -> None:
     issue = index.get(args.number)
     if issue is None:
         raise SystemExit(f"#{args.number} is not in the snapshot - run `triage fetch` first.")
-    report = triage_issue(issue, index, labelled, args.model)
+    confidence = None if args.all_labels else _live_confidence(index, labelled)
+    report = triage_issue(issue, index, labelled, args.model, confidence=confidence)
     if args.json:
         print(json.dumps(report, indent=2))
         return
     print(f"#{report['number']} {report['title']}")
     print(f"  suggested labels: {', '.join(report['labels']) or '-'}")
+    if report["high_precision"] and report["labels_all"] != report["labels"]:
+        held = sorted(set(report["labels_all"]) - set(report["labels"]))
+        print(f"  held back (low confidence): {', '.join(held)}")
     print("  for maintainer review (below the precision bar for a reply):")
     print(f"    possibly missing:    {', '.join(report['missing']) or '-'}")
     dupes = ", ".join(f"#{n}" for n in report["duplicates"]) or "-"
@@ -445,7 +462,15 @@ def cmd_shadow(args: argparse.Namespace) -> None:
 
     issues, index, labelled = _live_indexes()
     since = args.since or config.SHADOW_START
-    n = run_shadow(issues, index, labelled, since=since, limit=args.limit, model=args.model)
+    n = run_shadow(
+        issues,
+        index,
+        labelled,
+        since=since,
+        limit=args.limit,
+        model=args.model,
+        confidence=_live_confidence(index, labelled),
+    )
     print(f"{n} new predictions -> {config.SHADOW / 'predictions.jsonl'}")
 
 
@@ -498,7 +523,7 @@ def cmd_audit(args: argparse.Namespace) -> None:
         sample, _ = audit.load_sample()
         by_number = {i["number"]: i for i in test}
         rater = audit.rate_with_model(sample, by_number, DEFINITIONS, args.model)
-        print(f"AI rater done -> {audit.ratings_path(rater)}")
+        print(f"model rater done -> {audit.ratings_path(rater)}")
     else:
         from pytest_triage.evaluate import _now, save_result
 
@@ -558,7 +583,7 @@ def _guided(args: argparse.Namespace, test: list[dict], memory_index) -> None:
         guided.run_session(args.rater, plan, by_number, get_comments)
     elif args.action == "guided-ai":
         rater = guided.rate_with_model(plan, by_number, args.model)
-        print(f"AI rater done -> {guided.answers_path(rater, 'main')}")
+        print(f"model rater done -> {guided.answers_path(rater, 'main')}")
     else:
 
         def other_type(item: dict) -> bool:
@@ -608,7 +633,7 @@ def build_parser() -> argparse.ArgumentParser:
     p = ev.add_parser("labels", help="label predictors vs. maintainer labels")
     p.add_argument("--llm", action="store_true", help="include the Gemini classifier (costs money)")
     p.add_argument("--model", default=config.WORKHORSE)
-    p.add_argument("--prompt", default=config.LABEL_PROMPT, choices=["v1", "v2", "v3", "v3s"])
+    p.add_argument("--prompt", default=config.LABEL_PROMPT, choices=["v1", "v2", "v3", "v3s", "v4"])
     p.add_argument(
         "--split",
         default="test",
@@ -654,7 +679,7 @@ def build_parser() -> argparse.ArgumentParser:
     ).set_defaults(func=cmd_eval_significance)
     p = ev.add_parser("attacks", help="prompt-injection suite against the real model")
     p.add_argument("--model", default=None, help="override config's chosen models")
-    p.add_argument("--prompt", default=config.LABEL_PROMPT, choices=["v1", "v2", "v3", "v3s"])
+    p.add_argument("--prompt", default=config.LABEL_PROMPT, choices=["v1", "v2", "v3", "v3s", "v4"])
     p.add_argument(
         "--mutations", action="store_true", help="also run 5 automatic variants of each attack"
     )
@@ -669,13 +694,13 @@ def build_parser() -> argparse.ArgumentParser:
         func=cmd_shadow_score
     )
 
-    p = sub.add_parser("audit", help="human audit of the model's 'false positive' labels")
+    p = sub.add_parser("audit", help="audit of the model's 'false positive' labels")
     p.add_argument(
         "action",
         choices=["sample", "rate-ai", "score", "guided", "guided-ai", "guided-score"],
-        help="guided = the step-by-step type-label check for non-experts",
+        help="guided = the step-by-step type-label check",
     )
-    p.add_argument("--model", default=config.STEP_UP, help="AI rater model (rate-ai)")
+    p.add_argument("--model", default=config.STEP_UP, help="rater model (rate-ai, guided-ai)")
     p.add_argument("--n", type=int, default=50, help="sample size (sample, guided)")
     p.add_argument("--rater", default="human", help="rater name (guided)")
     p.set_defaults(func=cmd_audit)
@@ -688,6 +713,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("number", type=int)
     p.add_argument("--model", default=None, help="override config's chosen models")
     p.add_argument("--json", action="store_true")
+    p.add_argument(
+        "--all-labels", action="store_true", help="turn off high-precision mode for this issue"
+    )
     p.set_defaults(func=cmd_issue)
     return parser
 

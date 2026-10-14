@@ -42,3 +42,11 @@ def test_combine_gate_boost_and_route():
     assert learned.combine(llm, probs, "boost:0.9") == llm | {"type: bug"}
     route = {label: "logreg" for label in LABELS} | {"type: docs": "llm"}
     assert learned.combine(llm, probs, "route", route, {"type: bug"}) == {"type: docs", "type: bug"}
+
+
+def test_gate_keeps_only_labels_the_classifier_backs():
+    from pytest_triage.learned import gate
+
+    probs = {"type: bug": 0.95, "topic: config": 0.4}
+    assert gate({"type: bug", "topic: config"}, probs, 0.9) == {"type: bug"}
+    assert gate({"topic: config"}, probs, 0.9) == set()

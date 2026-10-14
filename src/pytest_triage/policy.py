@@ -28,12 +28,15 @@ def apply_policy(report: dict) -> dict:
     model's own outputs stay under `raw` for traces and evals, never for display."""
     out = dict(report)
     out["raw"] = {k: report[k] for k in ("labels", "missing", "duplicates")}
+    out["raw"]["labels"] = report.get("labels_all", report["labels"])
     quarantined = sorted(set(report["duplicates"]) & set(report["candidate_injection_signals"]))
     out["duplicates"] = [n for n in report["duplicates"] if n not in quarantined]
     out["quarantined_candidates"] = quarantined
     out["route"] = "human" if report["injection_signals"] else "suggest"
     if out["route"] == "human":
         out |= {"labels": [], "missing": [], "duplicates": []}
+        if "labels_all" in out:
+            out["labels_all"] = []
     return out
 
 

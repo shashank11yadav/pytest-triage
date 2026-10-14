@@ -1,16 +1,16 @@
 {
   "model": "gemini-3.5-flash-lite",
-  "prompt": "v3s",
+  "prompt": "v4",
   "split": "dev",
   "fingerprints": {
-    "labels": "df569380290760e4",
+    "labels": "30e0eee28a7953b8",
     "expand": "bd8dfd6600c99b3d",
     "verify": "9174893f1a2ececd"
   },
   "metrics": {
-    "macro_f1": 0.5503,
-    "micro_f1": 0.5457,
-    "needs_info_f1": 0.4494,
+    "macro_f1": 0.5672,
+    "micro_f1": 0.5552,
+    "needs_info_f1": 0.4545,
     "n": 256
   },
   "tolerance": 0.02

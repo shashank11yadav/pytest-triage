@@ -41,6 +41,7 @@ def run_shadow(
     since: str,
     limit: int,
     model: str | None = None,
+    confidence=None,
 ) -> int:
     """Triage issues created on/after `since` that haven't been predicted yet."""
     from pytest_triage.triage import triage_issue
@@ -48,7 +49,7 @@ def run_shadow(
     done = {p["number"] for p in load_predictions()}
     todo = [i for i in issues if i["created_at"] >= since and i["number"] not in done][:limit]
     for issue in todo:
-        report = triage_issue(issue, index, labelled, model)
+        report = triage_issue(issue, index, labelled, model, confidence=confidence)
         _append(TRACES, report | {"at": datetime.now(UTC).isoformat(timespec="seconds")})
         _append(
             PREDICTIONS,
@@ -61,7 +62,8 @@ def run_shadow(
                 "predicted_at": datetime.now(UTC).isoformat(timespec="seconds"),
                 "models": report["models"],
                 "route": report["route"],
-                "labels": report["labels"],
+                "labels": report["labels"],  # shown (high-precision mode when on)
+                "labels_all": report["labels_all"],  # everything the model suggested
                 "needs_info": bool(report["missing"]),
                 "duplicates": report["duplicates"],
                 "latency_s": report["trace"]["latency_s"],
@@ -85,6 +87,12 @@ def score_shadow(predictions: list[dict], issues: list[dict]) -> dict:
     labels = label_report(
         confusion((targets(i), set(p["labels"]) & set(LABELS)) for p, i in triaged)
     )
+    labels_all = label_report(
+        confusion(
+            (targets(i), set(p.get("labels_all", p["labels"])) & set(LABELS)) for p, i in triaged
+        )
+    )
+    shown = sum(bool(p["labels"]) for p, _ in triaged)
     tp = sum(p["needs_info"] and NEEDS_INFO in i["labels"] for p, i in triaged)
     fp = sum(p["needs_info"] and NEEDS_INFO not in i["labels"] for p, i in triaged)
     fn = sum(not p["needs_info"] and NEEDS_INFO in i["labels"] for p, i in triaged)
@@ -100,6 +108,8 @@ def score_shadow(predictions: list[dict], issues: list[dict]) -> dict:
         "maintainer_triaged": len(triaged),
         "still_untriaged": len(rows) - len(triaged),
         "labels": labels,
+        "labels_all": labels_all,
+        "issues_with_a_shown_label": shown,
         "needs_info": dict(zip(("precision", "recall", "f1"), prf(tp, fp, fn), strict=True)),
         "closed_as_duplicate": closed_dupe,
         "flagged_duplicate": flagged,

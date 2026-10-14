@@ -7,11 +7,13 @@ outputs - the model never writes prose that reaches a maintainer.
 """
 
 import time
+from collections.abc import Callable
 
 from pytest_triage import config, guard, llm, policy
 from pytest_triage.classify import assess
 from pytest_triage.config import DEDUPE_MODEL, LABEL_MODEL, LABEL_PROMPT
 from pytest_triage.dedupe import find_duplicates
+from pytest_triage.learned import gate
 from pytest_triage.search import IssueIndex
 
 
@@ -39,9 +41,15 @@ def triage_issue(
     labelled: IssueIndex,
     model: str | None = None,
     prompt: str = LABEL_PROMPT,
+    confidence: Callable[[dict], dict[str, float]] | None = None,
+    min_confidence: float | None = config.LABEL_MIN_CONFIDENCE,
 ) -> dict:
     """`index`: all issues (duplicate search). `labelled`: triaged issues (few-shot examples).
-    Both are searched only for issues created before this one."""
+    Both are searched only for issues created before this one.
+
+    With `confidence` (learned.make_confidence) and `min_confidence`, labels go through
+    the high-precision gate: `labels` holds what's shown, `labels_all` everything the
+    model suggested."""
     spent_before = llm.spent()
     started = time.perf_counter()
     timings = {}
@@ -58,7 +66,13 @@ def triage_issue(
     report = {
         "number": issue["number"],
         "title": issue["title"],
-        "labels": sorted(assessment["labels"]),
+        "labels": sorted(
+            gate(assessment["labels"], confidence(issue), min_confidence)
+            if confidence and min_confidence is not None
+            else assessment["labels"]
+        ),
+        "labels_all": sorted(assessment["labels"]),
+        "high_precision": bool(confidence and min_confidence is not None),
         "missing": assessment["missing"],
         "duplicates": dupes["duplicates"],
         "duplicate_verdicts": dupes["verdicts"],

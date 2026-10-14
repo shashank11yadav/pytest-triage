@@ -1,6 +1,6 @@
 """Label audit: are the model's "false positive" labels really wrong?
 
-Maintainers label minimally: on the test set they apply 1.01 of our 10 labels per
+Maintainers label minimally: on the test set they apply 1.01 of the original 10 labels per
 issue, while the model predicts 1.66. A label the model adds that maintainers
 didn't is therefore not necessarily wrong - it may just be one nobody applied.
 
@@ -124,8 +124,8 @@ RATER_SCHEMA = {
 def rate_with_model(
     sample: list[dict], by_number: dict[int, dict], definitions: dict[str, str], model: str
 ) -> str:
-    """A blind AI second rater: same information and rule a human gets, never sees
-    other raters' verdicts. Weaker than a human rater - say so wherever it's used."""
+    """A blind model rater: same information and rule as any other rater, never sees
+    other raters' verdicts."""
     from pytest_triage.guard import clean_for_prompt
     from pytest_triage.llm import BadOutput, generate_json, json_body
 

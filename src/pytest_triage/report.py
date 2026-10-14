@@ -32,7 +32,7 @@ def label_rows(labels: dict) -> list[tuple[str, float, float, int]]:
 def markdown_tables() -> str:
     labels, needs, dupes = _load("labels"), _load("needs_info"), _load("duplicates")
     dedupe, attacks = _load("dedupe"), _load("attacks")
-    out = ["### Labels (10 labels, test set)", "", "| Predictor | macro-F1 | micro-F1 | n |"]
+    out = ["### Labels (11 labels, test set)", "", "| Predictor | macro-F1 | micro-F1 | n |"]
     out.append("|---|---|---|---|")
     out += [f"| {k} | {m:.2f} | {mi:.2f} | {n} |" for k, m, mi, n in label_rows(labels)]
 
@@ -122,7 +122,7 @@ def html_page() -> str:
 
     rows = [[html.escape(k), f"{m:.2f}", f"{mi:.2f}", str(n)] for k, m, mi, n in label_rows(labels)]
     sections.append(
-        "<h2>Labels</h2><p>10 labels, scored on issues created after 2025-01-01 that "
+        "<h2>Labels</h2><p>11 labels, scored on issues created after 2025-01-01 that "
         "maintainers triaged. Anything that costs money must beat the free kNN vote.</p>"
         + _table(["Predictor", "macro-F1", "micro-F1", "n"], rows)
     )

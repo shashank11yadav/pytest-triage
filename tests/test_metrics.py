@@ -1,6 +1,7 @@
 import pytest
 
 from pytest_triage import baselines
+from pytest_triage.config import LABELS
 from pytest_triage.metrics import confusion, hit_at_k, label_report, prf, wilson
 
 
@@ -25,7 +26,7 @@ def test_label_report_macro_and_micro():
     report = label_report(c)
     assert report["labels"]["type: bug"]["f1"] == 1.0
     assert report["labels"]["type: docs"]["support"] == 1
-    assert report["macro_f1"] == pytest.approx(0.1)  # 1 of 10 labels perfect
+    assert report["macro_f1"] == pytest.approx(1 / len(LABELS))  # 1 label perfect
     assert report["micro_f1"] == pytest.approx(prf(1, 0, 1)[2])
 
 
