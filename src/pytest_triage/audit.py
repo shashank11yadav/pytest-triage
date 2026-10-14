@@ -122,14 +122,17 @@ RATER_SCHEMA = {
 
 
 def rate_with_model(
-    sample: list[dict], by_number: dict[int, dict], definitions: dict[str, str], model: str
+    sample: list[dict],
+    by_number: dict[int, dict],
+    definitions: dict[str, str],
+    model: str,
+    rater: str = "rater-b",
 ) -> str:
     """A blind model rater: same information and rule as any other rater, never sees
     other raters' verdicts."""
     from pytest_triage.guard import clean_for_prompt
     from pytest_triage.llm import BadOutput, generate_json, json_body
 
-    rater = f"ai-{model}"
     done = load_ratings(rater)
     for item in sample:
         if (item["number"], item["label"]) in done:

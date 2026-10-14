@@ -330,13 +330,14 @@ GUIDED_SCHEMA = {
 }
 
 
-def rate_with_model(plan: dict, by_number: dict[int, dict], model: str) -> str:
+def rate_with_model(
+    plan: dict, by_number: dict[int, dict], model: str, rater: str = "rater-2"
+) -> str:
     """A model rater given exactly what the guided session shows: the same question and
     the issue text, no maintainer labels, no other rater's answers."""
     from pytest_triage.guard import clean_for_prompt
     from pytest_triage.llm import BadOutput, generate_json, json_body
 
-    rater = f"ai-{model}"
     done = {(a["number"], a["label"]) for a in load_answers(rater, "main")}
     to_verdict = {"yes": "correct", "no": "wrong", "unsure": "unsure"}
     for item in plan["main"]:

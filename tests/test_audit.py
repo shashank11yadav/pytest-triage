@@ -56,4 +56,4 @@ def test_ai_rater_is_blind_and_falls_back_to_unsure(monkeypatch):
     audit.rate_with_model(sample, by_number, {"type: bug": "d", "type: docs": "d"}, "m")
     assert written == ["correct", "unsure"]  # invalid verdict -> unsure
     assert "Maintainers applied: type: question" in seen[0]
-    assert all("llm-rater-a" not in s for s in seen)  # never shown other raters' verdicts
+    assert all("rater-a" not in s for s in seen)  # never shown other raters' verdicts

@@ -1,73 +1,13 @@
 {
-  "guided type labels (ai-gemini-3.8-flash)": {
+  "guided type labels (rater-1)": {
     "agreement": {
-      "human": {
+      "rater-2": {
         "items": 50,
         "kappa": 0.56140350877193,
         "same": 46
       }
     },
-    "at": "2026-10-14T18:20:47+00:00",
-    "cautious": {
-      "adjusted_ci95": [
-        0.6300604889348226,
-        0.7953621300579009
-      ],
-      "adjusted_precision": 0.7144827586206897,
-      "measured_precision": 0.3793103448275862,
-      "rated": 50,
-      "share_ci95": [
-        0.40398634328388083,
-        0.6703056539821737
-      ],
-      "share_of_fps_correct": 0.54,
-      "unsure": 0
-    },
-    "conflicts": 21,
-    "main": {
-      "adjusted_ci95": [
-        0.8649588844932892,
-        0.9724544805252857
-      ],
-      "adjusted_precision": 0.936664320900774,
-      "measured_precision": 0.3793103448275862,
-      "rated": 50,
-      "share_ci95": [
-        0.7824337583502992,
-        0.9556211075129601
-      ],
-      "share_of_fps_correct": 0.8979591836734694,
-      "unsure": 1
-    },
-    "meta": {
-      "fp": 144,
-      "labels": "type: only",
-      "n_issues": 237,
-      "predictor": "llm:gemini-3.5-flash-lite:v3s",
-      "sample_size": 50,
-      "seeds": {
-        "main": 11,
-        "warmup": 5
-      },
-      "tp": 88
-    },
-    "rater": "ai-gemini-3.8-flash",
-    "warmup_ci95": [
-      0.0,
-      0.0
-    ],
-    "warmup_judged": 0,
-    "warmup_matched": 0
-  },
-  "guided type labels (human)": {
-    "agreement": {
-      "ai-gemini-3.8-flash": {
-        "items": 50,
-        "kappa": 0.56140350877193,
-        "same": 46
-      }
-    },
-    "at": "2026-10-14T18:20:47+00:00",
+    "at": "2026-10-14T19:37:05+00:00",
     "cautious": {
       "adjusted_ci95": [
         0.6300604889348226,
@@ -111,7 +51,7 @@
       },
       "tp": 88
     },
-    "rater": "human",
+    "rater": "rater-1",
     "warmup_ci95": [
       0.3126695474501864,
       0.8318224187964902
@@ -119,9 +59,69 @@
     "warmup_judged": 10,
     "warmup_matched": 6
   },
+  "guided type labels (rater-2)": {
+    "agreement": {
+      "rater-1": {
+        "items": 50,
+        "kappa": 0.56140350877193,
+        "same": 46
+      }
+    },
+    "at": "2026-10-14T19:37:06+00:00",
+    "cautious": {
+      "adjusted_ci95": [
+        0.6300604889348226,
+        0.7953621300579009
+      ],
+      "adjusted_precision": 0.7144827586206897,
+      "measured_precision": 0.3793103448275862,
+      "rated": 50,
+      "share_ci95": [
+        0.40398634328388083,
+        0.6703056539821737
+      ],
+      "share_of_fps_correct": 0.54,
+      "unsure": 0
+    },
+    "conflicts": 21,
+    "main": {
+      "adjusted_ci95": [
+        0.8649588844932892,
+        0.9724544805252857
+      ],
+      "adjusted_precision": 0.936664320900774,
+      "measured_precision": 0.3793103448275862,
+      "rated": 50,
+      "share_ci95": [
+        0.7824337583502992,
+        0.9556211075129601
+      ],
+      "share_of_fps_correct": 0.8979591836734694,
+      "unsure": 1
+    },
+    "meta": {
+      "fp": 144,
+      "labels": "type: only",
+      "n_issues": 237,
+      "predictor": "llm:gemini-3.5-flash-lite:v3s",
+      "sample_size": 50,
+      "seeds": {
+        "main": 11,
+        "warmup": 5
+      },
+      "tp": 88
+    },
+    "rater": "rater-2",
+    "warmup_ci95": [
+      0.0,
+      0.0
+    ],
+    "warmup_judged": 0,
+    "warmup_matched": 0
+  },
   "labels": {
     "agreed_items": 50,
-    "at": "2026-10-12T20:59:02+00:00",
+    "at": "2026-10-14T19:37:05+00:00",
     "kappa": 0.41391941391941395,
     "meta": {
       "fp": 225,
@@ -132,22 +132,7 @@
       "tp": 168
     },
     "raters": {
-      "ai-gemini-3.8-flash": {
-        "adjusted_ci95": [
-          0.6419885393134115,
-          0.7963270048125904
-        ],
-        "adjusted_precision": 0.7195824894843433,
-        "measured_precision": 0.42748091603053434,
-        "rated": 50,
-        "share_ci95": [
-          0.37467331533409215,
-          0.6442511684059913
-        ],
-        "share_of_fps_correct": 0.5102040816326531,
-        "unsure": 1
-      },
-      "llm-rater-a": {
+      "rater-a": {
         "adjusted_ci95": [
           0.6813315403836903,
           0.8380435498257576
@@ -161,6 +146,21 @@
         ],
         "share_of_fps_correct": 0.5869565217391305,
         "unsure": 4
+      },
+      "rater-b": {
+        "adjusted_ci95": [
+          0.6419885393134115,
+          0.7963270048125904
+        ],
+        "adjusted_precision": 0.7195824894843433,
+        "measured_precision": 0.42748091603053434,
+        "rated": 50,
+        "share_ci95": [
+          0.37467331533409215,
+          0.6442511684059913
+        ],
+        "share_of_fps_correct": 0.5102040816326531,
+        "unsure": 1
       }
     }
   }

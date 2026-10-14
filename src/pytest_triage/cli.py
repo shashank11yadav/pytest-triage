@@ -702,7 +702,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument("--model", default=config.STEP_UP, help="rater model (rate-ai, guided-ai)")
     p.add_argument("--n", type=int, default=50, help="sample size (sample, guided)")
-    p.add_argument("--rater", default="human", help="rater name (guided)")
+    p.add_argument("--rater", default="rater-1", help="rater name (guided)")
     p.set_defaults(func=cmd_audit)
 
     sub.add_parser("report", help="write docs/index.html + print README tables").set_defaults(
