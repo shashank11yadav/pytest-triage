@@ -611,6 +611,17 @@ def _guided(args: argparse.Namespace, test: list[dict], memory_index) -> None:
             print(f"agreement with {other}: {a['same']}/{a['items']} (kappa {a['kappa']:.2f})")
 
 
+def cmd_check_key(args: argparse.Namespace) -> None:
+    """Free check that Google accepts GEMINI_API_KEY (lists models, no tokens used)."""
+    from pytest_triage.llm import BadKey, check_key
+
+    try:
+        check_key()
+    except BadKey as e:
+        raise SystemExit(str(e)) from None
+    print("GEMINI_API_KEY accepted")
+
+
 def cmd_report(args: argparse.Namespace) -> None:
     from pytest_triage.report import markdown_tables, write_report
 
@@ -705,6 +716,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--rater", default="rater-1", help="rater name (guided)")
     p.set_defaults(func=cmd_audit)
 
+    sub.add_parser("check-key", help="check the Gemini key is accepted (free)").set_defaults(
+        func=cmd_check_key
+    )
     sub.add_parser("report", help="write docs/index.html + print README tables").set_defaults(
         func=cmd_report
     )

@@ -123,6 +123,7 @@ def github_token() -> str:
 def gemini_key() -> str:
     """GEMINI_API_KEY from the environment or ./.env."""
     load_dotenv(Path(".env"))
-    if key := os.environ.get("GEMINI_API_KEY"):
+    # Pasted secrets often carry a newline, spaces or quotes; none belong in a key.
+    if key := os.environ.get("GEMINI_API_KEY", "").strip().strip("'\""):
         return key
     raise RuntimeError("No Gemini key: put GEMINI_API_KEY=... in .env at the repo root.")

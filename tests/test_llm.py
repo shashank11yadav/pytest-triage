@@ -117,3 +117,23 @@ def test_generate_json_parses_or_raises():
     }
     with pytest.raises(BadOutput):
         generate_json({}, send=lambda b: broken)
+
+
+def test_bad_key_gets_a_clear_error(monkeypatch):
+    import httpx
+
+    from pytest_triage import llm
+
+    body = '{"error": {"code": 400, "details": [{"reason": "API_KEY_INVALID"}]}}'
+    monkeypatch.setattr(llm, "gemini_key", lambda: "x")
+    monkeypatch.setattr(llm.httpx, "post", lambda *a, **k: httpx.Response(400, text=body))
+    with pytest.raises(llm.BadKey):
+        llm.post({}, sleep=lambda s: None)
+
+
+def test_pasted_key_whitespace_and_quotes_are_stripped(monkeypatch):
+    from pytest_triage import config
+
+    monkeypatch.setattr(config, "load_dotenv", lambda *a, **k: None)
+    monkeypatch.setenv("GEMINI_API_KEY", ' "abc123"\n')
+    assert config.gemini_key() == "abc123"

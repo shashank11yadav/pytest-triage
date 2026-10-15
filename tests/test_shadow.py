@@ -50,3 +50,29 @@ def test_shadow_scores_shown_and_all_labels_separately():
     assert result["issues_with_a_shown_label"] == 1
     assert result["labels_all"]["labels"]["type: docs"]["f1"] == 1.0
     assert result["labels"]["labels"]["type: docs"]["f1"] == 0.0
+
+
+def test_one_bad_answer_skips_that_issue_only(monkeypatch, tmp_path):
+    from pytest_triage import shadow
+    from pytest_triage.llm import BadOutput
+
+    monkeypatch.setattr(shadow, "PREDICTIONS", tmp_path / "p.jsonl")
+    monkeypatch.setattr(shadow, "TRACES", tmp_path / "t.jsonl")
+
+    def fake_triage(issue, *a, **k):
+        if issue["number"] == 1:
+            raise BadOutput("cut off")
+        return {
+            "route": "suggest",
+            "labels": ["type: bug"],
+            "labels_all": ["type: bug"],
+            "missing": [],
+            "duplicates": [],
+            "models": {},
+            "trace": {"latency_s": 1.0, "cost_usd": 0.001},
+        }
+
+    monkeypatch.setattr("pytest_triage.triage.triage_issue", fake_triage)
+    new = [{"number": n, "created_at": "2026-10-15", "labels": [], "title": "t"} for n in (1, 2)]
+    assert shadow.run_shadow(new, None, None, since="2026-10-14", limit=10) == 1
+    assert [p["number"] for p in shadow.load_predictions(tmp_path / "p.jsonl")] == [2]

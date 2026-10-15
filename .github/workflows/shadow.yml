@@ -43,6 +43,7 @@ jobs:
             echo "::notice::GEMINI_API_KEY secret not set - skipping shadow run."
             exit 0
           fi
+          uv run triage check-key
           uv run triage fetch
           uv run triage shadow --limit 60
           uv run triage shadow-score

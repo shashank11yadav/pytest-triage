@@ -48,8 +48,17 @@ def run_shadow(
 
     done = {p["number"] for p in load_predictions()}
     todo = [i for i in issues if i["created_at"] >= since and i["number"] not in done][:limit]
+    from pytest_triage.llm import BadOutput
+
+    recorded = 0
     for issue in todo:
-        report = triage_issue(issue, index, labelled, model, confidence=confidence)
+        try:
+            report = triage_issue(issue, index, labelled, model, confidence=confidence)
+        except BadOutput as e:
+            # One malformed answer shouldn't stop the run. The issue isn't recorded,
+            # so the next run tries it again. A bad key or the spend cap still stops it.
+            print(f"  #{issue['number']}: skipped, bad model output ({e})", flush=True)
+            continue
         _append(TRACES, report | {"at": datetime.now(UTC).isoformat(timespec="seconds")})
         _append(
             PREDICTIONS,
@@ -70,12 +79,13 @@ def run_shadow(
                 "cost_usd": report["trace"]["cost_usd"],
             },
         )
+        recorded += 1
         print(
             f"  #{issue['number']:<6} {report['labels']} missing={len(report['missing'])} "
             f"dupes={report['duplicates']} ${report['trace']['cost_usd']:.4f}",
             flush=True,
         )
-    return len(todo)
+    return recorded
 
 
 def score_shadow(predictions: list[dict], issues: list[dict]) -> dict:

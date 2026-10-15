@@ -80,6 +80,32 @@ def spent(ledger: Path = LEDGER) -> float:
         return sum(json.loads(line)["cost_usd"] for line in f)
 
 
+class BadKey(RuntimeError):
+    """Google rejected GEMINI_API_KEY. Retrying can't help; the key must be replaced."""
+
+
+def _raise_for_key(response: httpx.Response) -> None:
+    if response.status_code in (400, 401, 403) and "API_KEY_INVALID" in response.text:
+        raise BadKey(
+            "Google rejected GEMINI_API_KEY (API_KEY_INVALID). Locally, fix it in .env; "
+            "in GitHub Actions, set the repo secret again with the key's value only."
+        )
+
+
+def check_key() -> None:
+    """Fail fast on a bad key with a free request (listing models costs nothing),
+    before any work is done. Raises BadKey, or RuntimeError on other failures."""
+    response = httpx.get(
+        GEMINI_URL.rsplit("/", 1)[0] + "/models",
+        headers={"x-goog-api-key": gemini_key()},
+        params={"pageSize": 1},
+        timeout=30.0,
+    )
+    _raise_for_key(response)
+    if response.is_error:
+        raise RuntimeError(f"Gemini {response.status_code}: {response.text[:300]}")
+
+
 def post(body: dict, sleep: Callable[[float], None] = time.sleep) -> dict:
     """The only function that touches the network. Retries transient errors with backoff."""
     for attempt in range(MAX_ATTEMPTS):
@@ -87,6 +113,7 @@ def post(body: dict, sleep: Callable[[float], None] = time.sleep) -> dict:
             GEMINI_URL, headers={"x-goog-api-key": gemini_key()}, json=body, timeout=120.0
         )
         if response.status_code not in RETRY_STATUSES or attempt == MAX_ATTEMPTS - 1:
+            _raise_for_key(response)
             if response.is_error:  # surface the API's own message, e.g. an unsupported setting
                 raise RuntimeError(f"Gemini {response.status_code}: {response.text[:500]}")
             return response.json()
