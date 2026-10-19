@@ -48,8 +48,20 @@ def test_shadow_scores_shown_and_all_labels_separately():
     issues = [issue(1, ["type: bug"]), issue(2, ["type: docs"])]
     result = score_shadow(preds, issues)
     assert result["issues_with_a_shown_label"] == 1
+    assert result["triaged_with_a_shown_label"] == 1
     assert result["labels_all"]["labels"]["type: docs"]["f1"] == 1.0
     assert result["labels"]["labels"]["type: docs"]["f1"] == 0.0
+
+
+def test_shown_labels_count_untriaged_issues_too():
+    # A label shown on an issue maintainers haven't labelled yet still counts as shown,
+    # but only triaged issues count towards the scored subset.
+    preds = [prediction(1, ["type: bug"]), prediction(2, ["topic: collection"]), prediction(3, [])]
+    issues = [issue(1, ["type: bug"]), issue(2, []), issue(3, [])]
+    result = score_shadow(preds, issues)
+    assert result["issues_with_a_shown_label"] == 2
+    assert result["triaged_with_a_shown_label"] == 1
+    assert result["maintainer_triaged"] == 1
 
 
 def test_one_bad_answer_skips_that_issue_only(monkeypatch, tmp_path):

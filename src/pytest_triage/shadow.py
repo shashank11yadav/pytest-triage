@@ -102,7 +102,8 @@ def score_shadow(predictions: list[dict], issues: list[dict]) -> dict:
             (targets(i), set(p.get("labels_all", p["labels"])) & set(LABELS)) for p, i in triaged
         )
     )
-    shown = sum(bool(p["labels"]) for p, _ in triaged)
+    shown = sum(bool(p["labels"]) for p, _ in rows)
+    shown_triaged = sum(bool(p["labels"]) for p, _ in triaged)
     tp = sum(p["needs_info"] and NEEDS_INFO in i["labels"] for p, i in triaged)
     fp = sum(p["needs_info"] and NEEDS_INFO not in i["labels"] for p, i in triaged)
     fn = sum(not p["needs_info"] and NEEDS_INFO in i["labels"] for p, i in triaged)
@@ -120,6 +121,7 @@ def score_shadow(predictions: list[dict], issues: list[dict]) -> dict:
         "labels": labels,
         "labels_all": labels_all,
         "issues_with_a_shown_label": shown,
+        "triaged_with_a_shown_label": shown_triaged,
         "needs_info": dict(zip(("precision", "recall", "f1"), prf(tp, fp, fn), strict=True)),
         "closed_as_duplicate": closed_dupe,
         "flagged_duplicate": flagged,
