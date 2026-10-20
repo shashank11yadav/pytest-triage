@@ -1,6 +1,6 @@
 {
   "backtest": {
-    "at": "2026-10-19T13:06:38+00:00",
+    "at": "2026-10-20T11:31:38+00:00",
     "closed_as_duplicate": [
       14995,
       14997,
@@ -33,7 +33,7 @@
       15124,
       15146
     ],
-    "issues_with_a_shown_label": 7,
+    "issues_with_a_shown_label": 36,
     "labels": {
       "labels": {
         "topic: collection": {
@@ -190,15 +190,18 @@
     "predicted_before_any_maintainer_label": 37,
     "routed_to_human": 0,
     "since": "2026-09-01T16:31:27Z",
-    "still_untriaged": 30
+    "still_untriaged": 30,
+    "triaged_with_a_shown_label": 7
   },
   "prospective": {
-    "at": "2026-10-19T13:06:38+00:00",
+    "at": "2026-10-20T11:31:38+00:00",
     "closed_as_duplicate": [],
-    "cost_usd_total": 0.0107,
+    "cost_usd_total": 0.0131,
     "flagged_and_closed_duplicate": [],
-    "flagged_duplicate": [],
-    "issues_with_a_shown_label": 0,
+    "flagged_duplicate": [
+      15221
+    ],
+    "issues_with_a_shown_label": 3,
     "labels": {
       "labels": {
         "topic: collection": {
@@ -343,7 +346,7 @@
       "macro_f1": 0.0,
       "micro_f1": 0.0
     },
-    "latency_p50_s": 2.97,
+    "latency_p50_s": 3.8,
     "latency_p95_s": 4.9,
     "maintainer_triaged": 0,
     "needs_info": {
@@ -351,10 +354,11 @@
       "precision": 0.0,
       "recall": 0.0
     },
-    "predicted": 5,
-    "predicted_before_any_maintainer_label": 5,
+    "predicted": 6,
+    "predicted_before_any_maintainer_label": 6,
     "routed_to_human": 0,
     "since": "2026-10-15T06:36:43Z",
-    "still_untriaged": 5
+    "still_untriaged": 6,
+    "triaged_with_a_shown_label": 0
   }
 }
