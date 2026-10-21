@@ -1,6 +1,6 @@
 {
   "backtest": {
-    "at": "2026-10-20T11:31:38+00:00",
+    "at": "2026-10-21T11:43:53+00:00",
     "closed_as_duplicate": [
       14995,
       14997,
@@ -194,9 +194,9 @@
     "triaged_with_a_shown_label": 7
   },
   "prospective": {
-    "at": "2026-10-20T11:31:38+00:00",
+    "at": "2026-10-21T11:43:53+00:00",
     "closed_as_duplicate": [],
-    "cost_usd_total": 0.0131,
+    "cost_usd_total": 0.0154,
     "flagged_and_closed_duplicate": [],
     "flagged_duplicate": [
       15221
@@ -220,7 +220,7 @@
           "f1": 0.0,
           "precision": 0.0,
           "recall": 0.0,
-          "support": 0
+          "support": 1
         },
         "topic: parametrize": {
           "f1": 0.0,
@@ -256,7 +256,7 @@
           "f1": 0.0,
           "precision": 0.0,
           "recall": 0.0,
-          "support": 0
+          "support": 1
         },
         "type: question": {
           "f1": 0.0,
@@ -289,10 +289,10 @@
           "support": 0
         },
         "topic: fixtures": {
-          "f1": 0.0,
-          "precision": 0.0,
-          "recall": 0.0,
-          "support": 0
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 1
         },
         "topic: parametrize": {
           "f1": 0.0,
@@ -325,10 +325,10 @@
           "support": 0
         },
         "type: proposal": {
-          "f1": 0.0,
-          "precision": 0.0,
-          "recall": 0.0,
-          "support": 0
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 1
         },
         "type: question": {
           "f1": 0.0,
@@ -343,18 +343,18 @@
           "support": 0
         }
       },
-      "macro_f1": 0.0,
-      "micro_f1": 0.0
+      "macro_f1": 0.18181818181818182,
+      "micro_f1": 1.0
     },
-    "latency_p50_s": 3.8,
+    "latency_p50_s": 3.12,
     "latency_p95_s": 4.9,
-    "maintainer_triaged": 0,
+    "maintainer_triaged": 1,
     "needs_info": {
       "f1": 0.0,
       "precision": 0.0,
       "recall": 0.0
     },
-    "predicted": 6,
+    "predicted": 7,
     "predicted_before_any_maintainer_label": 6,
     "routed_to_human": 0,
     "since": "2026-10-15T06:36:43Z",
