@@ -229,12 +229,15 @@ table {{ width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums
 th,td {{ text-align:left; padding:7px 10px; border-bottom:1px solid var(--line); }}
 th {{ font-weight:600; color:var(--muted); font-size:13px; }}
 .wrap {{ overflow-x:auto; }}
+footer {{ margin-top:40px; border-top:1px solid var(--line); font-size:13px; }}
 </style></head><body><main>
 <h1>pytest-triage</h1>
 <p>A shadow-mode triage assistant for
 <a href="https://github.com/pytest-dev/pytest">pytest-dev/pytest</a> issues, measured
 against what maintainers actually did. It never posts to GitHub.</p>
 {"".join(f'<div class="wrap">{s}</div>' for s in sections)}
+<footer><p>By Shashank Yadav &middot;
+<a href="https://www.shashankyadav.dev/work/pytest-triage">shashankyadav.dev</a></p></footer>
 </main></body></html>
 """
 

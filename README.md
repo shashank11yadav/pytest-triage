@@ -12,6 +12,8 @@ against what the maintainers actually did.
 
 Live results, updated daily: **https://shashank11yadav.github.io/pytest-triage/**
 
+Write-up and other projects: [shashankyadav.dev/work/pytest-triage](https://www.shashankyadav.dev/work/pytest-triage)
+
 ## Why
 
 pytest has 6,416 issues. Before 2025, maintainers labelled almost 80% of them.
