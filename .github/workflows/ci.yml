@@ -24,3 +24,5 @@ jobs:
       # post-processing lowers the frozen dev scores. See src/pytest_triage/regression.py.
       - name: Regression gate
         run: uv run pytest -q tests/test_regression.py
+      - name: Audit dependencies
+        run: uv run pip-audit --skip-editable
