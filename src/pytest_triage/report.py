@@ -12,6 +12,12 @@ from pytest_triage.config import LABELS, RESULTS, SHADOW
 
 DOCS = Path("docs")
 ISSUE_URL = "https://github.com/pytest-dev/pytest/issues/"
+PAGE_URL = "https://shashank11yadav.github.io/pytest-triage/"
+# Shown by search results and link previews (Slack, iMessage, LinkedIn, X).
+PAGE_DESCRIPTION = (
+    "A shadow-mode triage assistant for pytest issues: suggests labels, missing information "
+    "and likely duplicates, measured against what maintainers actually did."
+)
 
 
 def _load(name: str) -> dict:
@@ -215,6 +221,19 @@ def html_page() -> str:
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>pytest-triage results</title>
+<meta name="description" content="{PAGE_DESCRIPTION}">
+<!-- Link previews (Slack, iMessage, LinkedIn, X). The image needs an absolute URL. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Shashank Yadav">
+<meta property="og:title" content="pytest-triage: triage suggestions for pytest issues">
+<meta property="og:description" content="{PAGE_DESCRIPTION}">
+<meta property="og:url" content="{PAGE_URL}">
+<meta property="og:image" content="{PAGE_URL}og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="pytest-triage: triage suggestions for pytest issues">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@Shashankyadav30">
 <style>
 :root {{ --bg:#fff; --fg:#1d1d1f; --muted:#6e6e73; --line:#e5e5ea; --accent:#0a7d55; }}
 @media (prefers-color-scheme: dark) {{
