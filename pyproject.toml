@@ -5,7 +5,7 @@ description = "Shadow-mode triage agent for pytest-dev/pytest issues: labels, du
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "fastembed>=0.9.0",
+    "fastembed>=0.9.1",
     "httpx>=0.28.1",
     "numpy>=2.5.3",
     "python-dotenv>=1.2.4",
@@ -17,20 +17,15 @@ dependencies = [
 triage = "pytest_triage.cli:main"
 
 [build-system]
-requires = ["uv_build>=0.13.1,<0.14.0"]
+requires = ["uv_build>=0.13.5,<0.14.0"]
 build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
     "pip-audit>=2.10.1",
     "pytest>=9.1.1",
-    "ruff>=0.17.0",
+    "ruff>=0.17.2",
 ]
-
-[tool.uv]
-# fastembed 0.9.0 caps pillow below 13, but 12.x has known CVEs and this project only
-# uses fastembed's text models, never its image code. Drop once fastembed allows 13.
-override-dependencies = ["pillow>=13.0.0"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
