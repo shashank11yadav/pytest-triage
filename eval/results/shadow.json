@@ -1,6 +1,6 @@
 {
   "backtest": {
-    "at": "2026-10-31T12:20:44+00:00",
+    "at": "2026-11-01T13:15:52+00:00",
     "closed_as_duplicate": [
       14995,
       14997,
@@ -194,9 +194,9 @@
     "triaged_with_a_shown_label": 7
   },
   "prospective": {
-    "at": "2026-10-31T12:20:44+00:00",
+    "at": "2026-11-01T13:15:52+00:00",
     "closed_as_duplicate": [],
-    "cost_usd_total": 0.047,
+    "cost_usd_total": 0.0495,
     "flagged_and_closed_duplicate": [],
     "flagged_duplicate": [
       15221,
@@ -355,11 +355,11 @@
       "precision": 0.0,
       "recall": 0.0
     },
-    "predicted": 21,
-    "predicted_before_any_maintainer_label": 19,
+    "predicted": 22,
+    "predicted_before_any_maintainer_label": 20,
     "routed_to_human": 0,
     "since": "2026-10-15T06:36:43Z",
-    "still_untriaged": 19,
+    "still_untriaged": 20,
     "triaged_with_a_shown_label": 0
   }
 }
