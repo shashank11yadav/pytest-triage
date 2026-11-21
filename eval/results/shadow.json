@@ -1,6 +1,6 @@
 {
   "backtest": {
-    "at": "2026-11-20T15:23:10+00:00",
+    "at": "2026-11-21T14:35:49+00:00",
     "closed_as_duplicate": [
       14995,
       14997,
@@ -194,9 +194,9 @@
     "triaged_with_a_shown_label": 7
   },
   "prospective": {
-    "at": "2026-11-20T15:23:10+00:00",
+    "at": "2026-11-21T14:35:49+00:00",
     "closed_as_duplicate": [],
-    "cost_usd_total": 0.0865,
+    "cost_usd_total": 0.0889,
     "flagged_and_closed_duplicate": [],
     "flagged_duplicate": [
       15221,
@@ -348,7 +348,7 @@
       "macro_f1": 0.13636363636363635,
       "micro_f1": 0.4444444444444445
     },
-    "latency_p50_s": 3.26,
+    "latency_p50_s": 3.19,
     "latency_p95_s": 4.75,
     "maintainer_triaged": 3,
     "needs_info": {
@@ -356,11 +356,11 @@
       "precision": 0.0,
       "recall": 0.0
     },
-    "predicted": 38,
-    "predicted_before_any_maintainer_label": 35,
+    "predicted": 39,
+    "predicted_before_any_maintainer_label": 36,
     "routed_to_human": 0,
     "since": "2026-10-15T06:36:43Z",
-    "still_untriaged": 35,
+    "still_untriaged": 36,
     "triaged_with_a_shown_label": 0
   }
 }
